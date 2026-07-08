@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TVC Reference Hub — 블링크스튜디오</title>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #14171f;
+    --card: #1a1e29;
+    --card-hover: #222736;
+    --line: #2a3040;
+    --text: #e8eaf0;
+    --sub: #9aa3b5;
+    --accent: #f5c542;
+    --accent2: #5b8cff;
+    --danger: #ff5b6e;
+    --radius: 14px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 0 24px 80px; }
+
+  header {
+    padding: 32px 0 16px;
+    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  }
+  header h1 { font-size: 26px; letter-spacing: -0.5px; }
+  header h1 .dot { color: var(--accent); }
+  header .sub { color: var(--sub); font-size: 13px; }
+  header .date { margin-left: auto; color: #5f6a80; font-size: 12px; }
+
+  nav.tabs {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 20px;
+    position: sticky; top: 0; background: var(--bg); z-index: 20; padding-top: 8px;
+  }
+  nav.tabs button {
+    background: none; border: none; color: var(--sub);
+    font-size: 15px; font-weight: 600; font-family: inherit;
+    padding: 12px 16px; cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: color .15s;
+  }
+  nav.tabs button:hover { color: var(--text); }
+  nav.tabs button.active { color: var(--accent); border-bottom-color: var(--accent); }
+  nav.tabs button .cnt {
+    background: var(--card); border-radius: 10px; padding: 1px 8px;
+    font-size: 12px; margin-left: 6px; color: var(--sub);
+  }
+
+  /* ---------- filter bar ---------- */
+  .filterbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+  .filterbar .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .filterbar .chips button {
+    background: var(--card); color: var(--text); border: 1px solid var(--line);
+    border-radius: 999px; padding: 7px 15px; font-size: 13px; font-family: inherit;
+    cursor: pointer; transition: all .12s;
+  }
+  .filterbar .chips button:hover { border-color: var(--accent); color: var(--accent); }
+  .filterbar .chips button.on { background: var(--accent); color: #1a1400; border-color: var(--accent); font-weight: 700; }
+  .filterbar input {
+    margin-left: auto; min-width: 200px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    color: var(--text); padding: 9px 14px; font-size: 13.5px; font-family: inherit; outline: none;
+  }
+  .filterbar input:focus { border-color: var(--accent2); }
+
+  /* ---------- video grid ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .vcard {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    overflow: hidden; transition: transform .1s, border-color .15s;
+    display: flex; flex-direction: column;
+  }
+  .vcard:hover { transform: translateY(-2px); border-color: #3a4258; }
+  .vcard .thumb { aspect-ratio: 16/9; background: #000; cursor: pointer; position: relative; }
+  .vcard .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .vcard .thumb .play {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 42px; color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,.7); opacity: 0;
+    transition: opacity .15s; background: rgba(0,0,0,.25);
+  }
+  .vcard .thumb:hover .play { opacity: 1; }
+  .vcard .thumb .len {
+    position: absolute; right: 8px; bottom: 8px; background: rgba(0,0,0,.8); color: #fff;
+    font-size: 11.5px; padding: 2px 7px; border-radius: 6px;
+  }
+  .vcard .thumb iframe { width: 100%; height: 100%; border: 0; }
+  .vcard .meta { padding: 12px 14px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
+  .vcard .title { font-size: 13.5px; font-weight: 600; line-height: 1.45; word-break: break-word;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .vcard .ch { font-size: 12px; color: var(--sub); }
+  .vcard .foot { margin-top: auto; display: flex; align-items: center; gap: 8px; }
+  .vcard .tag {
+    font-size: 11px; background: rgba(91,140,255,.12); color: var(--accent2);
+    padding: 2px 9px; border-radius: 8px;
+  }
+  .vcard .tag.co { background: rgba(245,197,66,.1); color: var(--accent); }
+  .vcard .foot .sp { flex: 1; }
+  .vcard .foot button, .vcard .foot a {
+    background: none; border: none; color: #5f6a80; cursor: pointer;
+    font-size: 14px; font-family: inherit; text-decoration: none; padding: 2px;
+  }
+  .vcard .foot button:hover { color: var(--accent); }
+  .vcard .foot a:hover { color: var(--text); }
+  .vcard .foot button.saved { color: var(--accent); }
+  .vcard .foot button.del:hover { color: var(--danger); }
+
+  .morebar { text-align: center; margin-top: 22px; }
+
+  /* ---------- facet index ---------- */
+  .facetbar {
+    background: var(--bg2); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 16px 18px 14px; margin-bottom: 20px;
+  }
+  .facet-group { display: flex; gap: 12px; align-items: flex-start; padding: 7px 0; border-bottom: 1px dashed #222736; }
+  .facet-group:last-of-type { border-bottom: none; }
+  .facet-label { flex: 0 0 92px; font-size: 12.5px; font-weight: 700; color: var(--sub); padding-top: 8px; }
+  .facet-group .chips button { padding: 6px 12px; font-size: 12.5px; }
+  .facet-group .chips button.dim { opacity: .35; }
+  .facet-group .chips button .fcnt { color: #5f6a80; font-size: 11px; margin-left: 3px; }
+  .facet-group .chips button.on .fcnt { color: inherit; }
+  .facet-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  .facet-actions input {
+    flex: 1; min-width: 180px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; color: var(--text); padding: 9px 14px; font-size: 13.5px; font-family: inherit; outline: none;
+  }
+  .facet-actions input:focus { border-color: var(--accent2); }
+  .idx-count { color: var(--accent); font-size: 13.5px; font-weight: 700; white-space: nowrap; }
+  .tags-line { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag.fc { background: rgba(154,163,181,.12); color: var(--sub); cursor: pointer; transition: all .12s; }
+  .tag.fc:hover { background: rgba(245,197,66,.15); color: var(--accent); }
+
+  /* ---------- camera moves ---------- */
+  .move-nav {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    background: var(--bg2); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 12px 16px; margin-bottom: 8px;
+  }
+  .move-nav button {
+    background: var(--card); color: var(--text); border: 1px solid var(--line);
+    border-radius: 999px; padding: 7px 15px; font-size: 13px; font-family: inherit;
+    cursor: pointer; transition: all .12s;
+  }
+  .move-nav button:hover { border-color: var(--accent); color: var(--accent); }
+  .move-nav-hint { color: #5f6a80; font-size: 12px; margin-left: auto; }
+  .move-cat { font-size: 17px; font-weight: 800; margin: 34px 0 4px; color: var(--accent); scroll-margin-top: 70px; }
+  .move-sec { margin: 18px 0 30px; }
+  .move-head {
+    background: var(--bg2); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+    border-radius: var(--radius); padding: 16px 20px; margin-bottom: 14px;
+  }
+  .move-title { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+  .move-title .en { font-size: 13px; font-weight: 600; color: var(--accent2); margin-left: 6px; }
+  .move-desc { font-size: 13.5px; color: var(--text); line-height: 1.65; }
+  .move-tip { font-size: 13px; color: var(--sub); line-height: 1.6; margin-top: 7px; }
+  .mv-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+
+  /* ---------- 힙 스튜디오 100 ---------- */
+  .hp-block { margin-bottom: 30px; content-visibility: auto; contain-intrinsic-size: 320px; }
+  .hp-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    border-left: 4px solid var(--accent); padding-left: 12px;
+  }
+  .hp-name { font-size: 16.5px; font-weight: 800; }
+  .hp-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .hp-card .meta { padding: 9px 11px; }
+  .hp-card .title { font-size: 12px; -webkit-line-clamp: 1; }
+
+  /* ---------- 갱신 버튼/패널 & 계정 카드 ---------- */
+  .btn.sm { padding: 7px 13px; font-size: 12.5px; }
+  .upd-btns { display: inline-flex; gap: 6px; margin-left: 10px; }
+  .upd-panel {
+    position: fixed; right: 20px; bottom: 20px; z-index: 200;
+    width: min(480px, calc(100vw - 40px));
+    background: var(--bg2); border: 1px solid var(--accent); border-radius: var(--radius);
+    box-shadow: 0 10px 40px rgba(0,0,0,.5); padding: 14px 16px;
+  }
+  .upd-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .upd-head b { font-size: 14px; }
+  .upd-close { margin-left: auto; background: none; border: none; color: var(--sub); cursor: pointer; font-size: 14px; }
+  .upd-panel pre {
+    max-height: 200px; overflow-y: auto; font-size: 11.5px; line-height: 1.55;
+    color: var(--sub); white-space: pre-wrap; word-break: break-all;
+    background: var(--bg); border-radius: 8px; padding: 10px;
+  }
+  .acc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .acc {
+    display: block; text-decoration: none; color: inherit;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px 16px; transition: all .12s;
+  }
+  .acc:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .acc-name { font-weight: 700; font-size: 14.5px; margin-bottom: 4px; color: var(--accent2); }
+  .acc-desc { font-size: 12.5px; color: var(--sub); line-height: 1.5; }
+
+  .pf-badge {
+    position: absolute; left: 8px; top: 8px;
+    background: #17d5ff; color: #00303c; font-weight: 800; font-size: 12px;
+    width: 22px; height: 22px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lg-link {
+    display: inline-block; margin-right: 12px; color: var(--accent2);
+    font-size: 13px; text-decoration: none; font-weight: 600;
+  }
+  .lg-link:hover { color: var(--accent); }
+
+  /* ---------- 5초 컷 ---------- */
+  .sh-bar {
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    background: var(--bg2); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 12px 16px; margin-bottom: 18px;
+  }
+  .sh-bar .chips button { padding: 7px 15px; font-size: 13px; }
+  .sh-hint { color: #5f6a80; font-size: 12px; flex-basis: 100%; }
+  .sh-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .sh-thumb { aspect-ratio: 9/16 !important; }
+  .sh-card .meta { padding: 10px 12px; }
+  .sh-card .title { font-size: 12.5px; -webkit-line-clamp: 2; }
+  .sec-badge {
+    position: absolute; left: 8px; top: 8px;
+    background: var(--accent); color: #1a1400; font-weight: 800; font-size: 13px;
+    padding: 3px 10px; border-radius: 8px;
+  }
+  .seq-player {
+    display: flex; gap: 18px; align-items: stretch; flex-wrap: wrap;
+    background: var(--bg2); border: 1px solid var(--accent); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 22px;
+  }
+  .seq-frame {
+    flex: 0 0 300px; aspect-ratio: 9/16; max-height: 62vh;
+    background: #000; border-radius: 12px; overflow: hidden;
+  }
+  .seq-frame iframe { width: 100%; height: 100%; border: 0; }
+  .seq-info { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+  .seq-title { font-size: 15px; font-weight: 700; line-height: 1.5; }
+  .seq-ctrl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .seq-ctrl span { color: var(--accent); font-weight: 700; font-size: 13.5px; margin-left: 6px; }
+  .empty { color: var(--sub); font-size: 14px; padding: 50px 0; text-align: center; line-height: 1.8; }
+
+  /* ---------- player box (library) ---------- */
+  .playerbox {
+    background: var(--bg2); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px; margin-bottom: 24px;
+  }
+  .playerbox .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .playerbox input[type=text] {
+    flex: 1; min-width: 240px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; color: var(--text); padding: 11px 14px; font-size: 14px; font-family: inherit; outline: none;
+  }
+  .playerbox input[type=text]:focus { border-color: var(--accent2); }
+  .playerframe {
+    margin-top: 16px; aspect-ratio: 16/9; width: 100%;
+    background: #000; border-radius: 12px; overflow: hidden; display: none;
+  }
+  .playerframe iframe { width: 100%; height: 100%; border: 0; }
+  .saverow { display: none; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .saverow input, .saverow select {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    color: var(--text); padding: 10px 12px; font-size: 13.5px; font-family: inherit; outline: none;
+  }
+  .saverow input.t { flex: 2; min-width: 200px; }
+  .saverow input.g { flex: 1; min-width: 140px; }
+
+  .btn {
+    background: var(--accent); color: #1a1400; border: none; border-radius: 10px;
+    padding: 11px 20px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer;
+    white-space: nowrap; transition: filter .12s;
+  }
+  .btn:hover { filter: brightness(1.1); }
+  .btn.ghost { background: var(--card); color: var(--text); border: 1px solid var(--line); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); filter: none; }
+
+  .toolrow { display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
+
+  details.links { margin-top: 36px; border-top: 1px solid var(--line); padding-top: 14px; }
+  details.links summary { color: #5f6a80; font-size: 12.5px; cursor: pointer; }
+  details.links .lrow { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 14px; }
+  details.links a { color: var(--sub); font-size: 12.5px; text-decoration: none; }
+  details.links a:hover { color: var(--accent); }
+
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: #1a1400; font-weight: 700; font-size: 14px;
+    padding: 12px 24px; border-radius: 12px; opacity: 0; pointer-events: none;
+    transition: opacity .25s; z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+  .page { display: none; }
+  .page.active { display: block; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>TVC Reference Hub<span class="dot">.</span></h1>
+    <span class="sub">클릭하면 바로 재생 — BLINK STUDIO</span>
+    <span class="date" id="fetchedAt"></span>
+    <span class="upd-btns" id="updBtns" style="display:none">
+      <button class="btn ghost sm" onclick="startUpdate('quick')" title="큐레이션 피드·Vimeo 신작만 (약 1~2분)">🔄 신작 갱신</button>
+      <button class="btn ghost sm" onclick="startUpdate('full')" title="모든 데이터 재수집 (10분 이상)">⟳ 전체 갱신</button>
+    </span>
+  </header>
+
+  <div class="upd-panel" id="updPanel" style="display:none">
+    <div class="upd-head">
+      <b id="updTitle">데이터 갱신 중...</b>
+      <button class="btn sm" id="updReload" style="display:none" onclick="location.reload()">새로고침해서 반영</button>
+      <button class="upd-close" onclick="document.getElementById('updPanel').style.display='none'">✕</button>
+    </div>
+    <pre id="updLog"></pre>
+  </div>
+
+  <nav class="tabs" id="tabs"></nav>
+  <div id="pages"></div>
+
+  <!-- library page -->
+  <div class="page" id="page-lib">
+    <div class="playerbox">
+      <div class="row">
+        <input type="text" id="urlInput" placeholder="유튜브/비메오 URL을 직접 붙여넣어 재생·저장할 수도 있어요">
+        <button class="btn" onclick="loadUrl()">재생</button>
+      </div>
+      <div class="playerframe" id="playerFrame"></div>
+      <div class="saverow" id="saveRow">
+        <input type="text" class="t" id="saveTitle" placeholder="제목 (브랜드 / 캠페인명)">
+        <select id="saveCountry"></select>
+        <input type="text" class="g" id="saveTags" placeholder="태그 (쉼표 구분)">
+        <button class="btn" onclick="saveCurrent()">⭐ 보관함에 저장</button>
+      </div>
+    </div>
+    <div class="filterbar">
+      <div class="chips" id="libCountryChips"></div>
+      <input type="text" id="filterText" placeholder="제목/태그 검색" oninput="renderLib()">
+    </div>
+    <div class="grid" id="libGrid"></div>
+    <div class="toolrow">
+      <button class="btn ghost" onclick="exportLib()">보관함 내보내기 (JSON)</button>
+      <button class="btn ghost" onclick="document.getElementById('importFile').click()">가져오기</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importLib(this)">
+    </div>
+  </div>
+
+  <details class="links">
+    <summary>더 깊이 파고 싶을 때 — 국가별 광고 아카이브 사이트 (외부 링크)</summary>
+    <div class="lrow">
+      <a href="https://www.tvcf.co.kr" target="_blank">🇰🇷 TVCF</a>
+      <a href="https://www.adic.or.kr" target="_blank">🇰🇷 광고정보센터</a>
+      <a href="https://www.acc-cm.or.jp" target="_blank">🇯🇵 ACC Awards</a>
+      <a href="https://www.advertimes.com" target="_blank">🇯🇵 AdverTimes</a>
+      <a href="https://www.ispot.tv" target="_blank">🇺🇸 iSpot.tv</a>
+      <a href="https://www.adsoftheworld.com" target="_blank">🇺🇸 Ads of the World</a>
+      <a href="https://admeter.usatoday.com" target="_blank">🇺🇸 Super Bowl Ad Meter</a>
+      <a href="https://www.davidreviews.tv" target="_blank">🇬🇧 David Reviews</a>
+      <a href="https://lbbonline.com" target="_blank">🇬🇧 LBB</a>
+      <a href="https://www.dandad.org" target="_blank">🇬🇧 D&AD</a>
+      <a href="https://www.lovethework.com" target="_blank">🌍 Cannes Lions</a>
+      <a href="https://www.shots.net" target="_blank">🌍 shots</a>
+      <a href="https://www.adforum.com" target="_blank">🌍 AdForum</a>
+    </div>
+  </details>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script src="moves.js"></script>
+<script src="shorts.js"></script>
+<script src="legends.js"></script>
+<script src="motionv.js"></script>
+<script src="feeds.js"></script>
+<script src="hip.js"></script>
+<script>
+const DATA = window.TVC_DATA || null;
+const LS_KEY = "tvc_ref_hub_v1";
+const PAGE_SIZE = 24;
+
+let lib = [];
+try { lib = JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch (e) { lib = []; }
+let currentVideo = null;
+const state = {}; // per-country {cat, text, shown}
+let libCountryFilter = "";
+
+/* =============== BUILD =============== */
+const tabsEl = document.getElementById("tabs");
+const pagesEl = document.getElementById("pages");
+const countryIds = DATA ? Object.keys(DATA.countries) : [];
+
+countryIds.forEach(cid => {
+  const c = DATA.countries[cid];
+  const b = document.createElement("button");
+  b.id = "tab-" + cid;
+  b.innerHTML = c.label + ` <span class="cnt">${c.videos.length}</span>`;
+  b.onclick = () => showTab(cid);
+  tabsEl.appendChild(b);
+
+  state[cid] = { cat: "", text: "", shown: PAGE_SIZE };
+
+  const page = document.createElement("div");
+  page.className = "page";
+  page.id = "page-" + cid;
+  page.innerHTML = `
+    <div class="filterbar">
+      <div class="chips" id="chips-${cid}"></div>
+      <input type="text" placeholder="제목/브랜드 검색" oninput="setText('${cid}', this.value)">
+    </div>
+    <div class="grid" id="grid-${cid}"></div>
+    <div class="morebar" id="more-${cid}"></div>`;
+  pagesEl.appendChild(page);
+
+  const chips = page.querySelector("#chips-" + cid);
+  ["전체", ...c.cats].forEach(cat => {
+    const btn = document.createElement("button");
+    btn.textContent = cat;
+    btn.onclick = () => setCat(cid, cat === "전체" ? "" : cat, btn);
+    if (cat === "전체") btn.classList.add("on");
+    chips.appendChild(btn);
+  });
+});
+
+/* ===== facet index (색인) ===== */
+const FACET_GROUPS = [
+  { key: "people", label: "👤 사람" },
+  { key: "place", label: "📍 장소" },
+  { key: "mood", label: "🎭 분위기" },
+  { key: "tone", label: "🎨 색감·톤" },
+  { key: "format", label: "🎬 포맷" },
+];
+const ALL = [];
+countryIds.forEach(cid =>
+  DATA.countries[cid].videos.forEach(v => ALL.push({ ...v, cid })));
+const FACET_VALUES = {};
+FACET_GROUPS.forEach(g => {
+  const set = new Map();
+  ALL.forEach(v => ((v.facets || {})[g.key] || []).forEach(val => set.set(val, (set.get(val) || 0) + 1)));
+  FACET_VALUES[g.key] = [...set.entries()].sort((a, b) => b[1] - a[1]).map(e => e[0]);
+});
+const idxState = { country: "", text: "", shown: PAGE_SIZE, sel: {} };
+FACET_GROUPS.forEach(g => idxState.sel[g.key] = new Set());
+
+/* index tab */
+{
+  const b = document.createElement("button");
+  b.id = "tab-idx";
+  b.innerHTML = '🔎 색인';
+  b.onclick = () => showTab("idx");
+  tabsEl.appendChild(b);
+
+  const page = document.createElement("div");
+  page.className = "page";
+  page.id = "page-idx";
+  let groupsHtml = `
+    <div class="facet-group">
+      <div class="facet-label">🌏 국가</div>
+      <div class="chips" id="fchips-country">
+        <button class="on" onclick="setIdxCountry('', this)">전체</button>
+        ${countryIds.map(cid => `<button onclick="setIdxCountry('${cid}', this)">${labelOf(cid)}</button>`).join("")}
+      </div>
+    </div>`;
+  FACET_GROUPS.forEach(g => {
+    groupsHtml += `
+    <div class="facet-group">
+      <div class="facet-label">${g.label}</div>
+      <div class="chips" id="fchips-${g.key}">
+        ${FACET_VALUES[g.key].map(val =>
+          `<button data-val="${val}" onclick="toggleFacet('${g.key}', '${val}', this)">${val} <span class="fcnt"></span></button>`).join("")}
+      </div>
+    </div>`;
+  });
+  page.innerHTML = `
+    <div class="facetbar">
+      ${groupsHtml}
+      <div class="facet-actions">
+        <input type="text" placeholder="제목/브랜드 검색" oninput="idxState.text=this.value.trim().toLowerCase(); idxState.shown=${PAGE_SIZE}; renderIdx()">
+        <button class="btn ghost" onclick="resetIdx()">필터 초기화</button>
+        <span class="idx-count" id="idxCount"></span>
+      </div>
+    </div>
+    <div class="grid" id="grid-idx"></div>
+    <div class="morebar" id="more-idx"></div>`;
+  pagesEl.appendChild(page);
+}
+
+function idxFiltered(excludeGroup) {
+  return ALL.filter(v => {
+    if (idxState.country && v.cid !== idxState.country) return false;
+    if (idxState.text && !v.title.toLowerCase().includes(idxState.text) && !(v.ch || "").toLowerCase().includes(idxState.text)) return false;
+    for (const g of FACET_GROUPS) {
+      if (g.key === excludeGroup) continue;
+      const sel = idxState.sel[g.key];
+      if (sel.size) {
+        const vals = (v.facets || {})[g.key] || [];
+        if (![...sel].some(s => vals.includes(s))) return false;
+      }
+    }
+    return true;
+  });
+}
+function toggleFacet(key, val, btn) {
+  const sel = idxState.sel[key];
+  sel.has(val) ? sel.delete(val) : sel.add(val);
+  btn.classList.toggle("on");
+  idxState.shown = PAGE_SIZE;
+  renderIdx();
+}
+function setIdxCountry(cid, btn) {
+  idxState.country = cid;
+  document.querySelectorAll("#fchips-country button").forEach(x => x.classList.remove("on"));
+  btn.classList.add("on");
+  idxState.shown = PAGE_SIZE;
+  renderIdx();
+}
+function resetIdx() {
+  idxState.country = ""; idxState.text = ""; idxState.shown = PAGE_SIZE;
+  FACET_GROUPS.forEach(g => idxState.sel[g.key].clear());
+  document.querySelectorAll("#page-idx .chips button").forEach(x => x.classList.remove("on"));
+  const first = document.querySelector("#fchips-country button");
+  if (first) first.classList.add("on");
+  const inp = document.querySelector("#page-idx input");
+  if (inp) inp.value = "";
+  renderIdx();
+}
+function jumpToFacet(key, val) {
+  resetIdx();
+  idxState.sel[key].add(val);
+  const btn = document.querySelector(`#fchips-${key} button[data-val="${val}"]`);
+  if (btn) btn.classList.add("on");
+  showTab("idx");
+}
+function idxCardHtml(v, idx) {
+  const saved = isSaved(v.id);
+  const facets = v.facets || {};
+  const chips = [];
+  ["mood", "place", "people", "tone"].forEach(k =>
+    (facets[k] || []).slice(0, k === "mood" ? 2 : 1).forEach(val =>
+      chips.push(`<span class="tag fc" onclick="jumpToFacet('${k}','${val}')">${val}</span>`)));
+  return `
+    <div class="vcard">
+      <div class="thumb" id="th-idx-${idx}" onclick="playCard('idx',${idx},'${v.id}')">
+        <img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg" loading="lazy" alt="">
+        <div class="play">▶</div>
+        ${v.len ? `<div class="len">${v.len}</div>` : ""}
+      </div>
+      <div class="meta">
+        <div class="title">${escapeHtml(v.title)}</div>
+        <div class="ch">${labelOf(v.cid)} · ${escapeHtml(v.ch || "")}</div>
+        <div class="tags-line">${chips.join("")}</div>
+        <div class="foot">
+          <span class="tag">${v.cat}</span>
+          <span class="sp"></span>
+          <button class="${saved ? "saved" : ""}" title="보관함 저장"
+            onclick="quickSave('idx','${v.id}', this)">${saved ? "⭐" : "☆"}</button>
+          <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" title="YouTube에서 열기">↗</a>
+        </div>
+      </div>
+    </div>`;
+}
+function renderIdx() {
+  const list = idxFiltered(null);
+  const grid = document.getElementById("grid-idx");
+  const slice = list.slice(0, idxState.shown);
+  grid.innerHTML = slice.length
+    ? slice.map((v, i) => idxCardHtml(v, i)).join("")
+    : '<div class="empty" style="grid-column:1/-1">조건에 맞는 영상이 없어요 — 필터를 줄여보세요</div>';
+  grid._items = slice;
+  document.getElementById("idxCount").textContent = `${list.length}개 영상`;
+  const more = document.getElementById("more-idx");
+  more.innerHTML = list.length > idxState.shown
+    ? `<button class="btn ghost" onclick="idxState.shown += ${PAGE_SIZE}; renderIdx()">더 보기 (${idxState.shown}/${list.length})</button>`
+    : "";
+  // per-chip counts (해당 그룹 제외한 필터 기준)
+  FACET_GROUPS.forEach(g => {
+    const base = idxFiltered(g.key);
+    const counts = {};
+    base.forEach(v => ((v.facets || {})[g.key] || []).forEach(val => counts[val] = (counts[val] || 0) + 1));
+    document.querySelectorAll(`#fchips-${g.key} button`).forEach(btn => {
+      const val = btn.dataset.val;
+      const n = counts[val] || 0;
+      btn.querySelector(".fcnt").textContent = n;
+      btn.classList.toggle("dim", n === 0 && !idxState.sel[g.key].has(val));
+    });
+  });
+}
+
+/* ===== camera moves tab (커머셜 필름 카메라 무빙) ===== */
+const MOVES = (window.TVC_MOVES && window.TVC_MOVES.moves) || [];
+if (MOVES.length) {
+  const b = document.createElement("button");
+  b.id = "tab-mv";
+  b.innerHTML = '🎥 카메라 무빙';
+  b.onclick = () => showTab("mv");
+  tabsEl.appendChild(b);
+
+  const page = document.createElement("div");
+  page.className = "page";
+  page.id = "page-mv";
+
+  const cats = [...new Set(MOVES.map(m => m.cat))];
+  const navHtml = `
+    <div class="move-nav">
+      ${cats.map(c => `<button onclick="mvScrollCat('${c}')">${c}</button>`).join("")}
+      <span class="move-nav-hint">무빙 ${MOVES.length}종 · 영상 ${MOVES.reduce((n, m) => n + m.videos.length, 0)}개 — 커머셜 필름 관점의 설명과 활용 팁 포함</span>
+    </div>`;
+
+  let secsHtml = "";
+  let lastCat = "";
+  MOVES.forEach(m => {
+    if (m.cat !== lastCat) {
+      lastCat = m.cat;
+      secsHtml += `<h2 class="move-cat" id="mvcat-${m.cat}">${m.cat}</h2>`;
+    }
+    secsHtml += `
+    <div class="move-sec" id="mv-${m.key}">
+      <div class="move-head">
+        <div class="move-title">${m.name} <span class="en">${m.en}</span></div>
+        <div class="move-desc">${m.desc}</div>
+        <div class="move-tip">💡 커머셜 활용 — ${m.tip}</div>
+      </div>
+      <div class="grid mv-grid">
+        ${m.videos.map((v, i) => mvCardHtml(v, m, i)).join("")}
+      </div>
+    </div>`;
+  });
+
+  page.innerHTML = navHtml + secsHtml;
+  pagesEl.appendChild(page);
+}
+
+function mvCardHtml(v, m, i) {
+  const saved = isSaved(v.id);
+  return `
+    <div class="vcard">
+      <div class="thumb" id="th-mv-${m.key}-${i}" onclick="mvPlay('${m.key}',${i},'${v.id}')">
+        <img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg" loading="lazy" alt="">
+        <div class="play">▶</div>
+        ${v.len ? `<div class="len">${v.len}</div>` : ""}
+      </div>
+      <div class="meta">
+        <div class="title">${escapeHtml(v.title)}</div>
+        <div class="ch">${escapeHtml(v.ch || "")}</div>
+        <div class="foot">
+          <span class="tag">${m.name}</span>
+          <span class="sp"></span>
+          <button class="${saved ? "saved" : ""}" title="보관함 저장"
+            onclick="mvSave('${m.key}','${v.id}', this)">${saved ? "⭐" : "☆"}</button>
+          <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" title="YouTube에서 열기">↗</a>
+        </div>
+      </div>
+    </div>`;
+}
+function mvPlay(key, i, vid) {
+  const th = document.getElementById(`th-mv-${key}-${i}`);
+  if (th) th.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${vid}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+}
+function mvSave(key, vid, btn) {
+  const m = MOVES.find(x => x.key === key);
+  const v = m && m.videos.find(x => x.id === vid);
+  if (!v) return;
+  const i = lib.findIndex(x => x.videoId === vid);
+  if (i >= 0) {
+    lib.splice(i, 1);
+    persist();
+    btn.textContent = "☆"; btn.classList.remove("saved");
+    toast("보관함에서 뺐어요");
+    return;
+  }
+  lib.unshift({
+    platform: "youtube", videoId: vid,
+    url: "https://www.youtube.com/watch?v=" + vid,
+    title: v.title, country: "", tags: ["카메라 무빙", m.name],
+    addedAt: new Date().toISOString(),
+  });
+  persist();
+  btn.textContent = "⭐"; btn.classList.add("saved");
+  toast("⭐ 보관함에 저장했어요");
+}
+function mvScrollCat(cat) {
+  const el = document.getElementById("mvcat-" + cat);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* ===== 명가 & 디렉터 (프로덕션/디렉터/큐레이션 채널) ===== */
+/* 명가&디렉터 데이터: legends.js(유튜브 기반) + motionv.js(모션 스튜디오 공식 Vimeo).
+   모션그래픽 섹션은 motionv.js가 담당하므로 legends 쪽 구버전 섹션은 제외 */
+const LEGENDS = [
+  ...(((window.TVC_LEGENDS && window.TVC_LEGENDS.entries) || []).filter(e => !e.section.includes("모션그래픽"))),
+  ...(((window.TVC_MOTION && window.TVC_MOTION.entries) || [])),
+];
+if (LEGENDS.length) {
+  const b = document.createElement("button");
+  b.id = "tab-lg";
+  b.innerHTML = '🏆 명가 & 디렉터';
+  b.onclick = () => showTab("lg");
+  tabsEl.appendChild(b);
+
+  const page = document.createElement("div");
+  page.className = "page";
+  page.id = "page-lg";
+
+  const lgSections = [...new Set(LEGENDS.map(e => e.section))];
+  const navHtml = `
+    <div class="move-nav">
+      ${lgSections.map(s => `<button onclick="lgScroll('${s}')">${s}</button>`).join("")}
+      <span class="move-nav-hint">세계·국내 대표 프로덕션과 레전드 디렉터의 대표작 — 카드 링크로 공식 포트폴리오까지</span>
+    </div>`;
+
+  let secsHtml = "";
+  let last = "";
+  LEGENDS.forEach((e, ei) => {
+    if (e.section !== last) {
+      last = e.section;
+      secsHtml += `<h2 class="move-cat" id="lgcat-${e.section}">${e.section}</h2>`;
+    }
+    const linksHtml = e.links.map(l =>
+      `<a class="lg-link" href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`).join("");
+    secsHtml += `
+    <div class="move-sec">
+      <div class="move-head">
+        <div class="move-title">${e.name} <span class="en">${e.sub}</span></div>
+        <div class="move-desc">${e.desc}</div>
+        <div class="move-tip">${linksHtml}</div>
+      </div>
+      <div class="grid mv-grid">
+        ${e.videos.map((v, i) => lgCardHtml(v, ei, i, e.name)).join("")}
+      </div>
+    </div>`;
+  });
+  page.innerHTML = navHtml + secsHtml;
+  pagesEl.appendChild(page);
+}
+function lgCardHtml(v, ei, i, entryName) {
+  const saved = isSaved(v.id);
+  const isVimeo = v.platform === "vimeo";
+  const thumb = isVimeo
+    ? (v.thumb ? `<img src="${v.thumb}" loading="lazy" alt="">` : "")
+    : `<img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg" loading="lazy" alt="">`;
+  const extUrl = isVimeo ? `https://vimeo.com/${v.id}` : `https://www.youtube.com/watch?v=${v.id}`;
+  return `
+    <div class="vcard">
+      <div class="thumb" id="th-lg-${ei}-${i}" onclick="lgPlay(${ei},${i})">
+        ${thumb}
+        <div class="play">▶</div>
+        ${isVimeo ? '<div class="pf-badge">V</div>' : ""}
+        ${v.len ? `<div class="len">${v.len}</div>` : ""}
+      </div>
+      <div class="meta">
+        <div class="title">${escapeHtml(v.title)}</div>
+        <div class="ch">${escapeHtml(v.ch || "")}</div>
+        <div class="foot">
+          <span class="tag">${entryName}</span>
+          <span class="sp"></span>
+          <button class="${saved ? "saved" : ""}" title="보관함 저장"
+            onclick="lgSave(${ei},${i}, this)">${saved ? "⭐" : "☆"}</button>
+          <a href="${extUrl}" target="_blank" title="원본에서 열기">↗</a>
+        </div>
+      </div>
+    </div>`;
+}
+function lgPlay(ei, i) {
+  const v = LEGENDS[ei].videos[i];
+  const th = document.getElementById(`th-lg-${ei}-${i}`);
+  if (!th || !v) return;
+  const src = v.platform === "vimeo"
+    ? `https://player.vimeo.com/video/${v.id}?autoplay=1`
+    : `https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1`;
+  th.innerHTML = `<iframe src="${src}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+}
+function lgSave(ei, i, btn) {
+  const e = LEGENDS[ei];
+  const v = e && e.videos[i];
+  if (!v) return;
+  const idx = lib.findIndex(x => x.videoId === v.id);
+  if (idx >= 0) {
+    lib.splice(idx, 1); persist();
+    btn.textContent = "☆"; btn.classList.remove("saved");
+    toast("보관함에서 뺐어요");
+    return;
+  }
+  const isVimeo = v.platform === "vimeo";
+  lib.unshift({
+    platform: isVimeo ? "vimeo" : "youtube", videoId: v.id,
+    url: isVimeo ? "https://vimeo.com/" + v.id : "https://www.youtube.com/watch?v=" + v.id,
+    thumb: v.thumb || "",
+    title: v.title, country: "", tags: [e.name],
+    addedAt: new Date().toISOString(),
+  });
+  persist();
+  btn.textContent = "⭐"; btn.classList.add("saved");
+  toast("⭐ 보관함에 저장했어요");
+}
+function lgScroll(s) {
+  const el = document.getElementById("lgcat-" + s);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* ===== 💯 힙 스튜디오 100 ===== */
+const HIP = (window.TVC_HIP && window.TVC_HIP.studios) || [];
+const hpState = { cat: "", q: "" };
+if (HIP.length) {
+  const b = document.createElement("button");
+  b.id = "tab-hp";
+  b.innerHTML = `💯 스튜디오 100 <span class="cnt">${HIP.length}</span>`;
+  b.onclick = () => showTab("hp");
+  tabsEl.appendChild(b);
+
+  const cats = [...new Set(HIP.map(s => s.cat))];
+  const page = document.createElement("div");
+  page.className = "page";
+  page.id = "page-hp";
+  page.innerHTML = `
+    <div class="filterbar">
+      <div class="chips" id="hpChips">
+        <button class="on" onclick="setHpCat('', this)">전체 <span class="fcnt">${HIP.length}</span></button>
+        ${cats.map(c => `<button onclick="setHpCat('${c}', this)">${c} <span class="fcnt">${HIP.filter(s => s.cat === c).length}</span></button>`).join("")}
+      </div>
+      <input type="text" placeholder="스튜디오 이름 검색" oninput="hpState.q=this.value.trim().toLowerCase(); renderHip()">
+    </div>
+    <div class="sh-hint" style="display:block; margin:-8px 0 16px">전 세계 힙한 스튜디오 ${HIP.length}곳의 공식 계정 최신작 — 신작 갱신 버튼을 누를 때마다 새 작업물로 채워집니다</div>
+    <div id="hipList"></div>`;
+  pagesEl.appendChild(page);
+}
+function setHpCat(c, btn) {
+  hpState.cat = c;
+  document.querySelectorAll("#hpChips button").forEach(x => x.classList.remove("on"));
+  btn.classList.add("on");
+  renderHip();
+}
+function renderHip() {
+  const box = document.getElementById("hipList");
+  const list = HIP.map((s, si) => ({ s, si }))
+    .filter(({ s }) => (!hpState.cat || s.cat === hpState.cat) &&
+                       (!hpState.q || s.name.toLowerCase().includes(hpState.q)));
+  if (!list.length) {
+    box.innerHTML = '<div class="empty">조건에 맞는 스튜디오가 없어요</div>';
+    return;
+  }
+  box.innerHTML = list.map(({ s, si }) => `
+    <div class="hp-block">
+      <div class="hp-head">
+        <span class="hp-name">${escapeHtml(s.name)}</span>
+        <span class="tag">${s.cat}</span>
+        ${s.url ? `<a class="lg-link" href="${s.url}" target="_blank" rel="noopener">${s.user ? "Vimeo" : "채널"} ↗</a>` : ""}
+      </div>
+      <div class="grid hp-grid">
+        ${s.videos.map((v, vi) => {
+          const saved = isSaved(v.id);
+          const isV = v.platform === "vimeo";
+          const thumb = isV
+            ? (v.thumb ? `<img src="${v.thumb}" loading="lazy" alt="">` : "")
+            : `<img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg" loading="lazy" alt="">`;
+          return `
+          <div class="vcard hp-card">
+            <div class="thumb" id="th-hp-${si}-${vi}" onclick="hpPlay(${si},${vi})">
+              ${thumb}<div class="play">▶</div>
+              ${isV ? '<div class="pf-badge">V</div>' : ""}
+              ${v.len ? `<div class="len">${v.len}</div>` : ""}
+            </div>
+            <div class="meta">
+              <div class="title">${escapeHtml(v.title)}</div>
+              <div class="foot">
+                <span class="sp"></span>
+                <button class="${saved ? "saved" : ""}" onclick="hpSave(${si},${vi}, this)">${saved ? "⭐" : "☆"}</button>
+                <a href="${isV ? "https://vimeo.com/" + v.id : "https://www.youtube.com/watch?v=" + v.id}" target="_blank">↗</a>
+              </div>
+            </div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`).join("");
+}
+function hpPlay(si, vi) {
+  const v = HIP[si].videos[vi];
+  const th = document.getElementById(`th-hp-${si}-${vi}`);
+  if (!th || !v) return;
+  const src = v.platform === "vimeo"
+    ? `https://player.vimeo.com/video/${v.id}?autoplay=1`
+    : `https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1`;
+  th.innerHTML = `<iframe src="${src}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+}
+function hpSave(si, vi, btn) {
+  const s = HIP[si], v = s && s.videos[vi];
+  if (!v) return;
+  const idx = lib.findIndex(x => x.videoId === v.id);
+  if (idx >= 0) {
+    lib.splice(idx, 1); persist();
+    btn.textContent = "☆"; btn.classList.remove("saved");
+    toast("보관함에서 뺐어요");
+    return;
+  }
+  const isV = v.platform === "vimeo";
+  lib.unshift({
+    platform: isV ? "vimeo" : "youtube", videoId: v.id,
+    url: isV ? "https://vimeo.com/" + v.id : "https://www.youtube.com/watch?v=" + v.id,
+    thumb: v.thumb || "",
+    title: v.title, country: "", tags: [s.name, s.cat],
+    addedAt: new Date().toISOString(),
+  });
+  persist();
+  btn.textContent = "⭐"; btn.classList.add("saved");
+  toast("⭐ 보관함에 저장했어요");
+}
+
+/* ===== 📡 피드 (큐레이션 채널 최신 업로드 + 계정 모음) ===== */
+const FEEDS = (window.TVC_FEEDS && window.TVC_FEEDS.channels) || [];
+const fdState = { ch: "" };
+const FD_ACCOUNTS = [
+  { grp: "🌐 필수 큐레이션 사이트", items: [
+    ["Motionographer", "모션그래픽 신작 큐레이션의 성지", "https://motionographer.com"],
+    ["Stash Media", "모션/VFX/CG 큐레이션 매거진", "https://www.stashmedia.tv"],
+    ["Eyecandy", "비주얼 테크닉 사전 — 무빙·트랜지션·효과별 예시 정리", "https://eycndy.com"],
+    ["Art of the Title", "영화·시리즈 타이틀 시퀀스 아카이브", "https://www.artofthetitle.com"],
+    ["Vimeo Staff Picks", "비메오가 매일 고르는 최고의 필름", "https://vimeo.com/channels/staffpicks"],
+    ["Directors Notes", "단편·뮤비·광고 필름 데일리 큐레이션", "https://directorsnotes.com"],
+  ]},
+  { grp: "📸 인스타그램 계정", items: [
+    ["@adsoftheworld", "글로벌 캠페인 데일리 피드", "https://www.instagram.com/adsoftheworld/"],
+    ["@lbbonline", "LBB — 신작 광고·비하인드", "https://www.instagram.com/lbbonline/"],
+    ["@dandad", "D&AD — 수상작·크래프트", "https://www.instagram.com/dandad/"],
+    ["@filmsupply", "시네마틱 푸티지·촬영 레퍼런스", "https://www.instagram.com/filmsupply/"],
+    ["@adweek", "미국 광고 업계 화제작", "https://www.instagram.com/adweek/"],
+    ["@adage", "Ad Age — 캠페인 뉴스", "https://www.instagram.com/adage/"],
+  ]},
+  { grp: "🔎 탐색 바로가기", items: [
+    ["인스타 #tvcommercial", "해시태그 피드 탐색", "https://www.instagram.com/explore/tags/tvcommercial/"],
+    ["인스타 #commercialfilm", "커머셜 필름 태그", "https://www.instagram.com/explore/tags/commercialfilm/"],
+    ["핀터레스트: TVC reference", "무드보드용 이미지·컷 검색", "https://www.pinterest.com/search/pins/?q=tvc%20commercial%20reference"],
+    ["핀터레스트: storyboard", "광고 스토리보드 레퍼런스", "https://www.pinterest.com/search/pins/?q=commercial%20storyboard"],
+    ["Behance: commercial", "키비주얼·아트디렉션 프로젝트", "https://www.behance.net/search/projects?search=tv%20commercial"],
+  ]},
+];
+
+if (FEEDS.length) {
+  const b = document.createElement("button");
+  b.id = "tab-fd";
+  b.innerHTML = '📡 피드';
+  b.onclick = () => showTab("fd");
+  tabsEl.appendChild(b);
+
+  const page = document.createElement("div");
+  page.className = "page";
+  page.id = "page-fd";
+  const accHtml = FD_ACCOUNTS.map(g => `
+    <h2 class="sec">${g.grp}</h2>
+    <div class="acc-grid">
+      ${g.items.map(([name, desc, url]) => `
+        <a class="acc" href="${url}" target="_blank" rel="noopener">
+          <div class="acc-name">${name}</div>
+          <div class="acc-desc">${desc}</div>
+        </a>`).join("")}
+    </div>`).join("");
+  page.innerHTML = `
+    <div class="filterbar">
+      <div class="chips" id="fdChips">
+        <button class="on" onclick="setFdCh('', this)">전체 최신</button>
+        ${FEEDS.map(c => `<button onclick="setFdCh('${c.name}', this)" title="${c.desc}">${c.name}</button>`).join("")}
+      </div>
+      <span class="sh-hint" style="margin-left:auto">큐레이션 채널들의 최신 업로드 — 신작 갱신 버튼으로 새 피드를 받아옵니다</span>
+    </div>
+    <div class="grid" id="grid-fd"></div>
+    ${accHtml}`;
+  pagesEl.appendChild(page);
+}
+
+function fdItems() {
+  let items = [];
+  FEEDS.forEach(c => {
+    if (!fdState.ch || c.name === fdState.ch)
+      c.videos.forEach(v => items.push({ ...v, ch: c.name }));
+  });
+  items.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  return items;
+}
+function renderFd() {
+  const items = fdItems();
+  const grid = document.getElementById("grid-fd");
+  grid.innerHTML = items.map((v, i) => {
+    const saved = isSaved(v.id);
+    return `
+    <div class="vcard">
+      <div class="thumb" id="th-fd-${i}" onclick="playCard('fd',${i},'${v.id}')">
+        <img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg" loading="lazy" alt="">
+        <div class="play">▶</div>
+        ${v.date ? `<div class="len">${v.date.slice(5)}</div>` : ""}
+      </div>
+      <div class="meta">
+        <div class="title">${escapeHtml(v.title)}</div>
+        <div class="ch">${escapeHtml(v.ch)}</div>
+        <div class="foot">
+          <span class="tag">${escapeHtml(v.ch)}</span>
+          <span class="sp"></span>
+          <button class="${saved ? "saved" : ""}" onclick="fdSave(${i}, this)">${saved ? "⭐" : "☆"}</button>
+          <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank">↗</a>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+  grid._items = items.map(v => ({ ...v, id: v.id }));
+}
+function setFdCh(ch, btn) {
+  fdState.ch = ch;
+  document.querySelectorAll("#fdChips button").forEach(x => x.classList.remove("on"));
+  btn.classList.add("on");
+  renderFd();
+}
+function fdSave(i, btn) {
+  const v = document.getElementById("grid-fd")._items[i];
+  if (!v) return;
+  const idx = lib.findIndex(x => x.videoId === v.id);
+  if (idx >= 0) {
+    lib.splice(idx, 1); persist();
+    btn.textContent = "☆"; btn.classList.remove("saved");
+    toast("보관함에서 뺐어요");
+    return;
+  }
+  lib.unshift({
+    platform: "youtube", videoId: v.id,
+    url: "https://www.youtube.com/watch?v=" + v.id,
+    title: v.title, country: "", tags: ["피드", v.ch],
+    addedAt: new Date().toISOString(),
+  });
+  persist();
+  btn.textContent = "⭐"; btn.classList.add("saved");
+  toast("⭐ 보관함에 저장했어요");
+}
+
+/* ===== 데이터 갱신 (serve.py API) ===== */
+let updTimer = null;
+async function initUpdater() {
+  try {
+    const r = await fetch("/api/ping");
+    if (!r.ok) return;
+    document.getElementById("updBtns").style.display = "inline-flex";
+    const s = await (await fetch("/api/status")).json();
+    if (s.running) watchUpdate();
+  } catch (e) { /* 정적 서버/file:// — 버튼 숨김 유지 */ }
+}
+function startUpdate(mode) {
+  fetch("/api/update?mode=" + mode, { method: "POST" })
+    .then(r => r.json())
+    .then(j => {
+      if (j.ok) { toast(mode === "full" ? "전체 갱신 시작 (10분+)" : "신작 갱신 시작"); watchUpdate(); }
+      else toast(j.error || "갱신 시작 실패");
+    })
+    .catch(() => toast("서버에 연결할 수 없어요"));
+}
+function watchUpdate() {
+  document.getElementById("updPanel").style.display = "block";
+  document.getElementById("updReload").style.display = "none";
+  document.getElementById("updTitle").textContent = "데이터 갱신 중...";
+  pollUpdate();
+}
+async function pollUpdate() {
+  clearTimeout(updTimer);
+  try {
+    const s = await (await fetch("/api/status")).json();
+    const logEl = document.getElementById("updLog");
+    logEl.textContent = s.log.join("\n");
+    logEl.scrollTop = logEl.scrollHeight;
+    if (s.running) {
+      updTimer = setTimeout(pollUpdate, 2500);
+    } else if (s.done) {
+      document.getElementById("updTitle").textContent = "✅ 갱신 완료!";
+      document.getElementById("updReload").style.display = "inline-block";
+      toast("✅ 갱신 완료 — 새로고침하면 반영됩니다");
+    }
+  } catch (e) {
+    updTimer = setTimeout(pollUpdate, 4000);
+  }
+}
+initUpdater();
+
+/* ===== 5초 컷 (초단편 트랜지션/무빙 레퍼런스) ===== */
+const SHORTS = window.TVC_SHORTS || null;
+const shState = { group: "" };
+let seqList = [], seqIdx = -1, seqTimer = null;
+
+if (SHORTS && (SHORTS.core.length || SHORTS.ext.length)) {
+  const b = document.createElement("button");
+  b.id = "tab-sh";
+  b.innerHTML = `⚡ 5초 컷 <span class="cnt">${SHORTS.core.length + SHORTS.ext.length}</span>`;
+  b.onclick = () => showTab("sh");
+  tabsEl.appendChild(b);
+
+  const page = document.createElement("div");
+  page.className = "page";
+  page.id = "page-sh";
+  page.innerHTML = `
+    <div class="sh-bar">
+      <div class="chips" id="shChips">
+        <button class="on" onclick="setShGroup('', this)">전체</button>
+        ${SHORTS.groups.map(g => `<button onclick="setShGroup('${g}', this)">${g}</button>`).join("")}
+      </div>
+      <button class="btn" onclick="startSeq()">▶ 연속 재생</button>
+      <span class="sh-hint">TVC 컷 단위 참조용 초단편 레퍼런스 — 클릭 즉시 재생, 연속 재생은 컷이 끝나면 자동으로 다음 컷</span>
+    </div>
+    <div class="seq-player" id="seqPlayer" style="display:none">
+      <div class="seq-frame" id="seqFrame"></div>
+      <div class="seq-info">
+        <div class="seq-title" id="seqTitle"></div>
+        <div class="seq-ctrl">
+          <button class="btn ghost" onclick="seqStep(-1)">⏮ 이전</button>
+          <button class="btn ghost" onclick="seqStep(1)">다음 ⏭</button>
+          <button class="btn ghost" onclick="stopSeq()">■ 정지</button>
+          <span id="seqCount"></span>
+        </div>
+      </div>
+    </div>
+    <h2 class="sec">⚡ 5초 이내</h2>
+    <div class="grid sh-grid" id="shCore"></div>
+    <h2 class="sec">⏱ 6~10초</h2>
+    <div class="grid sh-grid" id="shExt"></div>`;
+  pagesEl.appendChild(page);
+}
+
+function shItems(listName) {
+  const src = listName === "core" ? SHORTS.core : SHORTS.ext;
+  return src.filter(v => !shState.group || v.group === shState.group);
+}
+function shCardHtml(v, listName, i) {
+  const saved = isSaved(v.id);
+  return `
+    <div class="vcard sh-card">
+      <div class="thumb sh-thumb" id="th-sh-${listName}-${i}" onclick="shPlay('${listName}',${i},'${v.id}')">
+        <img src="https://i.ytimg.com/vi/${v.id}/oardefault.jpg" loading="lazy" alt=""
+          onerror="this.onerror=null;this.src='https://img.youtube.com/vi/${v.id}/hqdefault.jpg'">
+        <div class="play">▶</div>
+        <div class="sec-badge">${v.sec}초</div>
+      </div>
+      <div class="meta">
+        <div class="title">${escapeHtml(v.title)}</div>
+        <div class="foot">
+          <span class="tag">${v.group}</span>
+          <span class="sp"></span>
+          <button class="${saved ? "saved" : ""}" title="보관함 저장"
+            onclick="shSave('${listName}',${i}, this)">${saved ? "⭐" : "☆"}</button>
+          <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" title="YouTube에서 열기">↗</a>
+        </div>
+      </div>
+    </div>`;
+}
+function renderShorts() {
+  if (!SHORTS) return;
+  document.getElementById("shCore").innerHTML =
+    shItems("core").map((v, i) => shCardHtml(v, "core", i)).join("") ||
+    '<div class="empty" style="grid-column:1/-1">이 그룹에는 5초 이내 컷이 없어요</div>';
+  document.getElementById("shExt").innerHTML =
+    shItems("ext").map((v, i) => shCardHtml(v, "ext", i)).join("") ||
+    '<div class="empty" style="grid-column:1/-1">이 그룹에는 6~10초 컷이 없어요</div>';
+}
+function setShGroup(g, btn) {
+  shState.group = g;
+  document.querySelectorAll("#shChips button").forEach(x => x.classList.remove("on"));
+  btn.classList.add("on");
+  stopSeq();
+  renderShorts();
+}
+function shPlay(listName, i, vid) {
+  const th = document.getElementById(`th-sh-${listName}-${i}`);
+  if (th) th.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${vid}?autoplay=1&loop=1&playlist=${vid}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+}
+function shSave(listName, i, btn) {
+  const v = shItems(listName)[i];
+  if (!v) return;
+  const idx = lib.findIndex(x => x.videoId === v.id);
+  if (idx >= 0) {
+    lib.splice(idx, 1); persist();
+    btn.textContent = "☆"; btn.classList.remove("saved");
+    toast("보관함에서 뺐어요");
+    return;
+  }
+  lib.unshift({
+    platform: "youtube", videoId: v.id,
+    url: "https://www.youtube.com/watch?v=" + v.id,
+    title: `[${v.sec}초] ` + v.title, country: "", tags: ["5초 컷", v.group],
+    addedAt: new Date().toISOString(),
+  });
+  persist();
+  btn.textContent = "⭐"; btn.classList.add("saved");
+  toast("⭐ 보관함에 저장했어요");
+}
+
+/* --- 연속 재생: 컷 길이만큼 재생 후 자동으로 다음 --- */
+function startSeq() {
+  seqList = [...shItems("core"), ...shItems("ext")];
+  if (!seqList.length) { toast("재생할 컷이 없어요"); return; }
+  seqIdx = -1;
+  document.getElementById("seqPlayer").style.display = "flex";
+  seqStep(1);
+}
+function seqStep(dir) {
+  clearTimeout(seqTimer);
+  if (!seqList.length) return;
+  seqIdx = (seqIdx + dir + seqList.length) % seqList.length;
+  const v = seqList[seqIdx];
+  document.getElementById("seqFrame").innerHTML =
+    `<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+  document.getElementById("seqTitle").textContent = `[${v.sec}초 · ${v.group}] ${v.title}`;
+  document.getElementById("seqCount").textContent = `${seqIdx + 1} / ${seqList.length}`;
+  seqTimer = setTimeout(() => seqStep(1), (v.sec + 2.5) * 1000);
+}
+function stopSeq() {
+  clearTimeout(seqTimer);
+  seqTimer = null; seqIdx = -1;
+  const p = document.getElementById("seqPlayer");
+  if (p) { p.style.display = "none"; document.getElementById("seqFrame").innerHTML = ""; }
+}
+
+/* library tab */
+{
+  const b = document.createElement("button");
+  b.id = "tab-lib";
+  b.innerHTML = '⭐ 내 보관함 <span class="cnt" id="libCnt"></span>';
+  b.onclick = () => showTab("lib");
+  tabsEl.appendChild(b);
+}
+
+if (DATA) {
+  document.getElementById("fetchedAt").textContent = "영상 데이터: " + DATA.fetchedAt + " 수집 (데이터갱신.bat로 업데이트)";
+} else {
+  pagesEl.innerHTML = '<div class="empty">data.js가 없습니다.<br><b>데이터갱신.bat</b>를 실행한 뒤 페이지를 새로고침하세요.</div>';
+}
+
+/* country selects/chips for library */
+function labelOf(cid) { return DATA && DATA.countries[cid] ? DATA.countries[cid].label : cid; }
+document.getElementById("saveCountry").innerHTML =
+  '<option value="">국가 선택</option>' + countryIds.map(cid => `<option value="${cid}">${labelOf(cid)}</option>`).join("");
+{
+  const box = document.getElementById("libCountryChips");
+  ["", ...countryIds].forEach(cid => {
+    const btn = document.createElement("button");
+    btn.textContent = cid === "" ? "전체" : labelOf(cid);
+    btn.onclick = () => {
+      libCountryFilter = cid;
+      box.querySelectorAll("button").forEach(x => x.classList.remove("on"));
+      btn.classList.add("on");
+      renderLib();
+    };
+    if (cid === "") btn.classList.add("on");
+    box.appendChild(btn);
+  });
+}
+
+/* =============== TABS =============== */
+function showTab(id) {
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("active", b.id === "tab-" + id));
+  document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === "page-" + id));
+  if (id === "lib") renderLib();
+  else if (id === "idx") renderIdx();
+  else if (id === "sh") renderShorts();
+  else if (id === "fd") renderFd();
+  else if (id === "hp") renderHip();
+  else if (id !== "mv" && id !== "lg") renderCountry(id);
+  if (id !== "sh") stopSeq();
+}
+
+/* =============== COUNTRY GRID =============== */
+function setCat(cid, cat, btn) {
+  state[cid].cat = cat;
+  state[cid].shown = PAGE_SIZE;
+  document.querySelectorAll("#chips-" + cid + " button").forEach(x => x.classList.remove("on"));
+  btn.classList.add("on");
+  renderCountry(cid);
+}
+function setText(cid, v) {
+  state[cid].text = v.trim().toLowerCase();
+  state[cid].shown = PAGE_SIZE;
+  renderCountry(cid);
+}
+function filtered(cid) {
+  const st = state[cid];
+  return DATA.countries[cid].videos.filter(v =>
+    (!st.cat || v.cat === st.cat) &&
+    (!st.text || v.title.toLowerCase().includes(st.text) || (v.ch || "").toLowerCase().includes(st.text)));
+}
+function isSaved(id) { return lib.some(x => x.videoId === id); }
+
+function cardHtml(v, cid, idx) {
+  const saved = isSaved(v.id);
+  const facets = v.facets || {};
+  const chips = [];
+  ["mood", "place", "people"].forEach(k =>
+    (facets[k] || []).slice(0, k === "mood" ? 2 : 1).forEach(val =>
+      chips.push(`<span class="tag fc" onclick="jumpToFacet('${k}','${val}')">${val}</span>`)));
+  return `
+    <div class="vcard">
+      <div class="thumb" id="th-${cid}-${idx}" onclick="playCard('${cid}',${idx},'${v.id}')">
+        <img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg" loading="lazy" alt="">
+        <div class="play">▶</div>
+        ${v.len ? `<div class="len">${v.len}</div>` : ""}
+      </div>
+      <div class="meta">
+        <div class="title">${escapeHtml(v.title)}</div>
+        <div class="ch">${escapeHtml(v.ch || "")}</div>
+        <div class="tags-line">${chips.join("")}</div>
+        <div class="foot">
+          <span class="tag">${v.cat}</span>
+          <span class="sp"></span>
+          <button class="${saved ? "saved" : ""}" title="보관함 저장"
+            onclick="quickSave('${cid}','${v.id}', this)">${saved ? "⭐" : "☆"}</button>
+          <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" title="YouTube에서 열기">↗</a>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderCountry(cid) {
+  if (!DATA) return;
+  const list = filtered(cid);
+  const st = state[cid];
+  const grid = document.getElementById("grid-" + cid);
+  const slice = list.slice(0, st.shown);
+  grid.innerHTML = slice.length
+    ? slice.map((v, i) => cardHtml(v, cid, i)).join("")
+    : '<div class="empty" style="grid-column:1/-1">조건에 맞는 영상이 없어요</div>';
+  // stash for play/save lookup
+  grid._items = slice;
+  const more = document.getElementById("more-" + cid);
+  more.innerHTML = list.length > st.shown
+    ? `<button class="btn ghost" onclick="state['${cid}'].shown += ${PAGE_SIZE}; renderCountry('${cid}')">더 보기 (${st.shown}/${list.length})</button>`
+    : "";
+}
+
+function playCard(cid, idx, vid) {
+  const th = document.getElementById(`th-${cid}-${idx}`);
+  if (th) th.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${vid}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+}
+
+function quickSave(cid, vid, btn) {
+  const grid = document.getElementById("grid-" + cid);
+  const v = (grid._items || []).find(x => x.id === vid);
+  if (!v) return;
+  const i = lib.findIndex(x => x.videoId === vid);
+  if (i >= 0) {
+    lib.splice(i, 1);
+    persist();
+    btn.textContent = "☆"; btn.classList.remove("saved");
+    toast("보관함에서 뺐어요");
+    return;
+  }
+  const facetTags = v.facets ? [...(v.facets.mood || []).slice(0, 2), ...(v.facets.place || []).slice(0, 1)] : [];
+  lib.unshift({
+    platform: "youtube", videoId: v.id,
+    url: "https://www.youtube.com/watch?v=" + v.id,
+    title: v.title, country: v.cid || cid, tags: [v.cat, ...facetTags],
+    addedAt: new Date().toISOString(),
+  });
+  persist();
+  btn.textContent = "⭐"; btn.classList.add("saved");
+  toast("⭐ 보관함에 저장했어요");
+}
+
+/* =============== URL PLAYER =============== */
+function parseVideoUrl(url) {
+  url = url.trim();
+  let m;
+  if ((m = url.match(/(?:youtube\.com\/(?:watch\?.*v=|shorts\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/)))
+    return { platform: "youtube", videoId: m[1] };
+  if ((m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/)))
+    return { platform: "vimeo", videoId: m[1] };
+  return null;
+}
+function embedSrc(v) {
+  return v.platform === "youtube"
+    ? `https://www.youtube-nocookie.com/embed/${v.videoId}`
+    : `https://player.vimeo.com/video/${v.videoId}`;
+}
+function loadUrl() {
+  const url = document.getElementById("urlInput").value;
+  const v = parseVideoUrl(url);
+  if (!v) { toast("유튜브 / 비메오 URL을 인식하지 못했어요 🥲"); return; }
+  currentVideo = { ...v, url: url.trim() };
+  const frame = document.getElementById("playerFrame");
+  frame.innerHTML = `<iframe src="${embedSrc(v)}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+  frame.style.display = "block";
+  document.getElementById("saveRow").style.display = "flex";
+}
+function saveCurrent() {
+  if (!currentVideo) return;
+  const title = document.getElementById("saveTitle").value.trim() || currentVideo.url;
+  const country = document.getElementById("saveCountry").value;
+  const tags = document.getElementById("saveTags").value.split(",").map(t => t.trim()).filter(Boolean);
+  if (lib.some(x => x.videoId === currentVideo.videoId)) { toast("이미 보관함에 있는 영상이에요"); return; }
+  lib.unshift({ ...currentVideo, title, country, tags, addedAt: new Date().toISOString() });
+  persist();
+  document.getElementById("saveTitle").value = "";
+  document.getElementById("saveTags").value = "";
+  renderLib();
+  toast("⭐ 보관함에 저장했어요");
+}
+
+/* =============== LIBRARY =============== */
+function persist() {
+  localStorage.setItem(LS_KEY, JSON.stringify(lib));
+  updateCnt();
+}
+function updateCnt() {
+  const el = document.getElementById("libCnt");
+  if (el) el.textContent = lib.length;
+}
+function removeItem(i) { lib.splice(i, 1); persist(); renderLib(); }
+
+function renderLib() {
+  const grid = document.getElementById("libGrid");
+  const ft = document.getElementById("filterText").value.trim().toLowerCase();
+  const items = lib.map((x, i) => ({ ...x, _i: i }))
+    .filter(x => !libCountryFilter || x.country === libCountryFilter)
+    .filter(x => !ft || x.title.toLowerCase().includes(ft) || (x.tags || []).join(" ").toLowerCase().includes(ft));
+
+  if (!items.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
+      아직 저장된 영상이 없어요.<br>나라별 탭에서 ☆를 누르면 여기에 쌓입니다.</div>`;
+    updateCnt();
+    return;
+  }
+  grid.innerHTML = items.map(x => `
+    <div class="vcard">
+      <div class="thumb" id="libth-${x._i}" onclick="playLib(${x._i})">
+        ${x.platform === "youtube"
+          ? `<img src="https://img.youtube.com/vi/${x.videoId}/hqdefault.jpg" loading="lazy" alt=""><div class="play">▶</div>`
+          : x.thumb
+            ? `<img src="${x.thumb}" loading="lazy" alt=""><div class="play">▶</div>`
+            : `<div class="play" style="opacity:.85">▶ Vimeo</div>`}
+      </div>
+      <div class="meta">
+        <div class="title">${escapeHtml(x.title)}</div>
+        <div class="foot" style="flex-wrap:wrap">
+          ${x.country ? `<span class="tag co">${labelOf(x.country)}</span>` : ""}
+          ${(x.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}
+          <span class="sp"></span>
+          <a href="${x.url}" target="_blank" title="원본 열기">↗</a>
+          <button class="del" onclick="removeItem(${x._i})" title="삭제">✕</button>
+        </div>
+      </div>
+    </div>`).join("");
+  updateCnt();
+}
+function playLib(i) {
+  const x = lib[i];
+  const th = document.getElementById("libth-" + i);
+  if (th) th.innerHTML = `<iframe src="${embedSrc(x)}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+/* =============== IMPORT / EXPORT =============== */
+function exportLib() {
+  const blob = new Blob([JSON.stringify(lib, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "tvc_reference_library.json";
+  a.click();
+  toast("JSON 파일로 내보냈어요");
+}
+function importLib(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!Array.isArray(data)) throw 0;
+      let added = 0;
+      data.forEach(x => {
+        if (x.videoId && !lib.some(y => y.videoId === x.videoId)) { lib.push(x); added++; }
+      });
+      persist(); renderLib();
+      toast(added + "개 영상을 가져왔어요");
+    } catch (e) { toast("JSON 파일을 읽지 못했어요"); }
+  };
+  reader.readAsText(file);
+  input.value = "";
+}
+
+/* =============== TOAST =============== */
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+/* init */
+updateCnt();
+if (countryIds.length) showTab(countryIds[0]);
+</script>
+</body>
+</html>

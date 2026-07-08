@@ -1,0 +1,62 @@
+name: data-update
+
+on:
+  schedule:
+    - cron: "0 23 * * *"   # 매일 08:00 KST — 평일 quick, 일요일 full
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "quick(신작 피드만) 또는 full(전체 재수집)"
+        default: "quick"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Decide mode (일요일이면 full)
+        id: mode
+        run: |
+          MODE="${{ github.event.inputs.mode }}"
+          if [ -z "$MODE" ]; then
+            [ "$(date -u +%u)" = "6" ] && MODE=full || MODE=quick
+          fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "선택된 모드: $MODE"
+      - name: Quick update (신작 피드)
+        if: steps.mode.outputs.mode == 'quick'
+        run: |
+          python update_feeds.py
+          python update_vimeo.py
+          python update_hip.py
+      - name: Full update (전체 재수집)
+        if: steps.mode.outputs.mode == 'full'
+        run: |
+          python update_data.py
+          python update_moves.py
+          python update_shorts.py
+          python update_legends.py
+          python update_vimeo.py
+          python update_hip.py
+          python update_feeds.py
+          python tag_tools.py fallback
+      - name: Commit & push
+        run: |
+          git config user.name "tvc-hub-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "auto-update(${{ steps.mode.outputs.mode }}) $(date -u +%F)"
+          git fetch origin main && git merge -s ours origin/main -m "merge remote" || true
+          git push
