@@ -572,7 +572,7 @@ function idxCardHtml(v, idx) {
       </div>
       <div class="meta">
         <div class="title">${escapeHtml(v.title)}</div>
-        <div class="ch">${labelOf(v.cid)} · ${escapeHtml(v.ch || "")}</div>
+        <div class="ch">${labelOf(v.cid)} · ${escapeHtml(v.ch || "")}${v.ago ? ` · <span style="color:var(--accent2)">${escapeHtml(v.ago)}</span>` : ""}</div>
         <div class="tags-line">${chips.join("")}</div>
         <div class="foot">
           <span class="tag">${v.cat}</span>
@@ -1314,7 +1314,7 @@ function cardHtml(v, cid, idx) {
       </div>
       <div class="meta">
         <div class="title">${escapeHtml(v.title)}</div>
-        <div class="ch">${escapeHtml(v.ch || "")}</div>
+        <div class="ch">${escapeHtml(v.ch || "")}${v.ago ? ` · <span style="color:var(--accent2)">${escapeHtml(v.ago)}</span>` : ""}</div>
         <div class="tags-line">${chips.join("")}</div>
         <div class="foot">
           <span class="tag">${v.cat}</span>

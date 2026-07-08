@@ -79,8 +79,15 @@ COUNTRIES = {
 
 PER_QUERY = 12
 
-def fetch(query: str):
+# 클래식 허용 카테고리 — 이 외에는 전부 최신(올해 업로드) 필터 적용
+CLASSIC_CATS = {"명작", "크리스마스", "칸 수상작"}
+SP_THIS_YEAR = "EgQIBRAB"   # 업로드=올해 + 동영상
+
+
+def fetch(query: str, sp: str = ""):
     url = "https://www.youtube.com/results?search_query=" + urllib.parse.quote(query)
+    if sp:
+        url += "&sp=" + sp
     req = urllib.request.Request(url, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=20) as r:
         html = r.read().decode("utf-8", errors="ignore")
@@ -98,8 +105,9 @@ def fetch(query: str):
                 title = "".join(r.get("text", "") for r in v.get("title", {}).get("runs", []))
                 channel = "".join(r.get("text", "") for r in v.get("ownerText", {}).get("runs", []))
                 length = v.get("lengthText", {}).get("simpleText", "")
+                ago = v.get("publishedTimeText", {}).get("simpleText", "")
                 if vid and title:
-                    items.append({"id": vid, "title": title, "ch": channel, "len": length})
+                    items.append({"id": vid, "title": title, "ch": channel, "len": length, "ago": ago})
             for val in node.values():
                 walk(val)
         elif isinstance(node, list):
@@ -114,14 +122,18 @@ def main():
     for cid, c in COUNTRIES.items():
         vids, seen = [], set()
         for cat, q in c["cats"]:
+            is_classic = cat in CLASSIC_CATS
             try:
-                results = fetch(q)
+                results = fetch(q, "" if is_classic else SP_THIS_YEAR)
             except Exception as e:
                 print(f"  ! {cid}/{cat} 실패: {e}")
                 results = []
             n = 0
             for v in results:
                 if v["id"] in seen:
+                    continue
+                # 최신 카테고리인데 2년 이상 지난 영상이면 제외 (필터 누수 방어)
+                if not is_classic and re.search(r"([2-9]|\d{2,})\s*(년 전|years? ago)", v.get("ago", "")):
                     continue
                 seen.add(v["id"])
                 v["cat"] = cat
