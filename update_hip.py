@@ -93,6 +93,63 @@ KR_YT = [
     ("돌고래유괴단", "라이브액션", "UCUsLcIQq0poAfOxRyJbxlLA"),
     ("스튜디오좋", "라이브액션", "UCxFdgtAN5xWDpsfvyJVUWLw"),
 ]
+
+# 🤖 AI 스튜디오/크리에이터/플랫폼 — probe_ai.py로 채널명+업로드 내용까지 검증 완료 (사칭 다수 걸러냄)
+AI_YT = [
+    # AI 프로덕션 스튜디오
+    ("Secret Level", "🤖 AI", "UCu6dHfrDMOY6bSbuITAO7Nw"),          # @wearesecretlevel (Jason Zada)
+    ("Asteria Film", "🤖 AI", "UCMeCXkPNhIQRiTVNh4_-GBA"),          # @asteriafilmco
+    ("Shy Kids", "🤖 AI", "UCMD3Z7bn_8pXvh6t1qFZ9yg"),              # Sora 'Air Head'
+    ("Deep Voodoo", "🤖 AI", "UC334RA4uV0GgrWk7oYjVdCQ"),           # 사우스파크 딥페이크 스튜디오
+    ("Fable Studio (Showrunner)", "🤖 AI", "UCgeA15FI0nHrfLV4wyMJ2vA"),
+    ("Machine Cinema", "🤖 AI", "UCnPopH-FI5UF3ArDLQZvFug"),
+    ("Silverside AI", "🤖 AI", "UCzymVcPb40TWIwMizTkttEQ"),
+    ("Genre.ai", "🤖 AI", "UCr_ACIDxeGaKT_HXkTXCo0w"),              # PJ Ace의 바이럴 AI 광고
+    ("Private Island", "🤖 AI", "UCkoueJORbHjPPFY1ZFrUEAA"),        # @privateislandtv (BUNKER BOYZ)
+    ("Corridor Digital", "🤖 AI", "UCsn6cjffsvyOZCZxvGoJxGg"),
+    # AI 필름메이커/디렉터
+    ("The Dor Brothers", "🤖 AI", "UCNMK68M-Al4hRUcew07TnUA"),
+    ("Neural Viz", "🤖 AI", "UCC84bgs01Qv2S7byU2rUYig"),            # Monoverse
+    ("Paul Trillo", "🤖 AI", "UCOFatLCBnl28J2MN25FRH-g"),
+    ("Martin Haerlin", "🤖 AI", "UCc1Y9mzGO_CyhS1Yhn5WyOQ"),
+    ("Ruairi Robinson", "🤖 AI", "UCcL_0WVGJe-ji6PLa4TrxUQ"),
+    ("Kavan the Kid", "🤖 AI", "UCMOiV-agwdaNxJENLQ_Sudg"),
+    ("Hashem Al-Ghaili", "🤖 AI", "UCfAInEvJMxEq_pCb9vehdCw"),
+    ("Aze Alter", "🤖 AI", "UCKov4eoFWVXXrqDX5GrqQfQ"),
+    ("Metapuppet", "🤖 AI", "UCsqod3mDyrhIxy8QoZRn0DA"),
+    ("Abandoned Films", "🤖 AI", "UC1R2q_TrFkCJvDBucYdRMPg"),
+    ("demonflyingfox", "🤖 AI", "UCvdUBO1nKje-SqOqBQm1Rmw"),
+    ("Karen X. Cheng", "🤖 AI", "UC0nBp9LDpQMXEvYtvIsTV1w"),
+    ("Bilawal Sidhu", "🤖 AI", "UC7bGK0A1weWfNaRfO0hGVdg"),
+    ("Don Allen Stevenson III", "🤖 AI", "UCTdn5DOTtaZlBrB2K8y1Dzw"),
+    ("The Reel Robot", "🤖 AI", "UC_3t5WerQttfnOzm5y3pbnw"),
+    ("Matan Cohen-Grumi", "🤖 AI", "UCGFoauxWLGRkhvcIXFJ12aA"),
+    ("Brandon Baum", "🤖 AI", "UC4Wi365DuW8py-om4NhyFTQ"),
+    ("CyberJungle", "🤖 AI", "UCsilEv_20FmmBr5CDzmTMgg"),
+    ("Diesol", "🤖 AI", "UC0ldjipZJaCYbQBTqgxGZ4g"),
+    ("Theoretically Media", "🤖 AI", "UC9Ryt3XOGYBoAJVsBHNGDzA"),
+    ("Curious Refuge", "🤖 AI", "UClnFtyUEaxQOCd1s5NKYGFA"),
+    ("AI Warehouse", "🤖 AI", "UCMT1Aw4R4nf_sFNDeuJqc6w"),
+    # AI 플랫폼 공식 쇼케이스
+    ("Runway", "🤖 AI", "UCUBqu_z5uP0AZhYtuyFZB3g"),
+    ("OpenAI (Sora)", "🤖 AI", "UCXZCJLdBC09xxGZ6gcdrc6A"),
+    ("Google DeepMind (Veo)", "🤖 AI", "UCP7jMXSY2xbc3KCAE0MHQ-A"),
+    ("Luma AI", "🤖 AI", "UC45T0I4p7A3dI0XvhivafZQ"),
+    ("Pika", "🤖 AI", "UC0SclYU4iiQRihtmDnak-gQ"),
+    ("Kling AI", "🤖 AI", "UCScFj8erJ91w8-jzNrNzrDA"),
+    ("Higgsfield AI", "🤖 AI", "UCh13OyDSm-Kb8ij3yZArtFg"),
+    ("Midjourney", "🤖 AI", "UCldFPBqAVrok5DPUQeSMEqQ"),
+    ("ElevenLabs", "🤖 AI", "UC-ew9TfeD887qUSiWWAAj1w"),
+    ("KREA", "🤖 AI", "UC7Vnwia5cnhlbaA5bmZW-lA"),
+    ("Leonardo Ai", "🤖 AI", "UCnWRbz_bw_L3YIp22wiu_7w"),
+    ("HeyGen", "🤖 AI", "UCV0FmNF3iM-022BF1KbVtxA"),
+    ("Suno", "🤖 AI", "UCB80OYIR33HGCc-_cT0AsUA"),
+    ("Stability AI", "🤖 AI", "UCrhOqMww3ItTHOKxtYM56cg"),
+    ("Viggle AI", "🤖 AI", "UCzXsdXxT0W7NqPoEThdxN7A"),
+    ("Topaz Labs", "🤖 AI", "UCRe2W-32N-_uStDULAEdyKA"),
+    ("Genmo AI", "🤖 AI", "UCLhnGJz493IJoANBTs-YOQw"),
+    ("Descript", "🤖 AI", "UCg_u9QlUisVk89RizEpEvFA"),
+]
 KR_PINS = [
     ("자이언트스텝", "CG/VFX", [("lsXPCVm0ZXs", "2019 GIANTSTEP VFX REEL", "2:00"),
                                 ("6X28U3L-93Y", "2020 GIANTSTEP NEW MEDIA REEL", "1:44"),
@@ -170,11 +227,14 @@ def main():
             r["url"] = f"https://vimeo.com/{r['user']}"
             out["studios"].append(r)
             print(f"  {r['name']}: {len(r['videos'])}개")
-    for name, cat, cid in KR_YT:
+    for name, cat, cid in KR_YT + AI_YT:
         try:
             vids = yt_rss(cid)[:PER]
         except Exception as e:
             print(f"  ! {name}: {e}")
+            continue
+        if not vids:
+            print(f"  ! {name}: 업로드 없음 — 건너뜀")
             continue
         out["studios"].append({"name": name, "cat": cat, "user": "",
                                "url": f"https://www.youtube.com/channel/{cid}", "videos": vids})
