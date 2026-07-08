@@ -36,6 +36,12 @@ VIMEO_STUDIOS = [
     ("Vallée Duhamel", "모션/디자인", "valleeduhamel"), ("Optical Arts", "모션/디자인", "opticalarts"),
     ("Panoply", "모션/디자인", "panoply"), ("Bien", "모션/디자인", "bien"),
     ("Wednesday Studio", "모션/디자인", "wednesdaystudio"), ("Whitelight Motion", "모션/디자인", "whitelightmotion"),
+    # 3차 웨이브 (probe_wave3.py 검증 완료)
+    ("Gretel", "모션/디자인", "gretel"), ("Method Studios", "모션/디자인", "methodstudios"),
+    ("Wonderlust", "모션/디자인", "wonderlust"), ("IV Studio", "모션/디자인", "ivstudio"),
+    ("The Furrow", "모션/디자인", "thefurrow"), ("Slanted Studios", "모션/디자인", "slantedstudios"),
+    ("Nomint", "모션/디자인", "nomint"), ("Moving Brands", "모션/디자인", "movingbrands"),
+    ("Zelig", "모션/디자인", "zeligstudio"),
     # ---- CG/VFX ----
     ("The Mill", "CG/VFX", "millchannel"), ("Framestore", "CG/VFX", "framestore"),
     ("Analog", "CG/VFX", "analogstudio"), ("Electric Theatre Collective", "CG/VFX", "electrictheatre"),
@@ -43,6 +49,9 @@ VIMEO_STUDIOS = [
     ("Ars Thanea", "CG/VFX", "arsthanea"), ("Aggressive", "CG/VFX", "aggressive"),
     ("Perception", "CG/VFX", "experienceperception"), ("Territory Studio", "CG/VFX", "territory"),
     ("Zombie Studio", "CG/VFX", "zombiestudio"),
+    ("RISE FX", "CG/VFX", "risefx"), ("Blacksmith VFX", "CG/VFX", "blacksmithvfx"),
+    ("Mathematic", "CG/VFX", "mathematicstudio"), ("Axis Studios", "CG/VFX", "axisstudios"),
+    ("Mikros Animation", "CG/VFX", "mikrosanimation"), ("ILP (Important Looking Pirates)", "CG/VFX", "ilpvfx"),
     # ---- 애니메이션 ----
     ("Nexus Studios", "애니메이션", "nexusstudios"), ("Passion Pictures", "애니메이션", "passionpictures"),
     ("Moth Studio", "애니메이션", "mothstudio"), ("Le Cube", "애니메이션", "lecube"),
@@ -52,6 +61,8 @@ VIMEO_STUDIOS = [
     ("Aardman", "애니메이션", "aardman"), ("Studio AKA", "애니메이션", "studioaka"),
     ("Strange Beast", "애니메이션", "strangebeast"), ("Animade", "애니메이션", "animadetv"),
     ("Job, Joris & Marieke", "애니메이션", "jobjorisenmarieke"),
+    ("The Line", "애니메이션", "thelineanimation"), ("Sun Creature", "애니메이션", "suncreature"),
+    ("Rubber House", "애니메이션", "rubberhouse"),
     # ---- 타이틀/브랜딩 ----
     ("Imaginary Forces", "타이틀/브랜딩", "imaginaryforces"), ("Prologue Films", "타이틀/브랜딩", "prologuefilms"),
     ("Filmograph", "타이틀/브랜딩", "filmograph"), ("Digital Kitchen", "타이틀/브랜딩", "digitalkitchen"),
@@ -64,11 +75,17 @@ VIMEO_STUDIOS = [
     ("Lief", "라이브액션", "lief"), ("Agile Films", "라이브액션", "agilefilms"),
     ("Knucklehead", "라이브액션", "knucklehead"), ("FRIEND", "라이브액션", "friendlondon"),
     ("BWGTBLD", "라이브액션", "bwgtbld"), ("Academy Films", "라이브액션", "academy"),
+    ("Superprime", "라이브액션", "superprime"), ("The Directors Bureau", "라이브액션", "thedirectorsbureau"),
+    ("Scoundrel", "라이브액션", "scoundrelfilms"), ("Exit Films", "라이브액션", "exitfilms"),
+    ("Blink Productions", "라이브액션", "blinkprods"), ("New Land", "라이브액션", "newland"),
     # ---- 미디어아트 ----
     ("Universal Everything", "미디어아트", "universaleverything"), ("FIELD.IO", "미디어아트", "field"),
     ("Sila Sveta", "미디어아트", "silasveta"), ("Moment Factory", "미디어아트", "momentfactory"),
     ("onformative", "미디어아트", "onformative"), ("Random Studio", "미디어아트", "randomstudio"),
     ("WOW inc.", "미디어아트", "wowinc"),
+    ("teamLab", "미디어아트", "teamlab"), ("Nohlab", "미디어아트", "nohlab"),
+    ("Ouchhh", "미디어아트", "ouchhh"), ("Marshmallow Laser Feast", "미디어아트", "marshmallowlaserfeast"),
+    ("AntiVJ", "미디어아트", "antivj"),
 ]
 
 # 국내 (Vimeo 미활동 → YouTube 채널 RSS / 고정핀)

@@ -86,6 +86,25 @@ class Handler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _bytes(self, data, ctype, code=200):
+        self.send_response(code)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(data)
+
+    def _read_body(self):
+        n = int(self.headers.get("Content-Length") or 0)
+        try:
+            return json.loads(self.rfile.read(n).decode("utf-8")) if n else {}
+        except Exception:
+            return {}
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.end_headers()
+
     def do_GET(self):
         parsed = urlparse(self.path)
         if parsed.path == "/api/ping":
@@ -102,6 +121,10 @@ class Handler(SimpleHTTPRequestHandler):
     def end_headers(self):
         if self.path.endswith((".js", ".html")) or self.path == "/":
             self.send_header("Cache-Control", "no-store")
+        # 웹 배포판(GitHub Pages)에서도 로컬 헬퍼를 부를 수 있게 CORS 허용
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
         super().end_headers()
 
     def do_POST(self):
@@ -114,7 +137,106 @@ class Handler(SimpleHTTPRequestHandler):
                 STATE.update(running=True, mode=mode, log=[], done=False, startedAt=time.time())
             threading.Thread(target=run_update, args=(mode,), daemon=True).start()
             return self._json({"ok": True, "mode": mode})
+        if parsed.path == "/api/download":
+            body = self._read_body()
+            url = body.get("url", "")
+            if not url.startswith("http"):
+                return self._json({"ok": False, "error": "잘못된 URL"}, 400)
+            threading.Thread(target=do_download, args=(url,), daemon=True).start()
+            return self._json({"ok": True, "dest": str(DL_DIR)})
+        if parsed.path == "/api/frame":
+            body = self._read_body()
+            url, t = body.get("url", ""), float(body.get("t") or 0)
+            if not url.startswith("http"):
+                return self._json({"ok": False, "error": "잘못된 URL"}, 400)
+            try:
+                jpg, path = do_frame(url, t)
+                import base64
+                return self._json({"ok": True, "path": path,
+                                   "jpg_b64": base64.b64encode(jpg).decode()})
+            except Exception as e:
+                return self._json({"ok": False, "error": str(e)[:300]}, 500)
         return self._json({"ok": False, "error": "unknown"}, 404)
+
+
+# ---------------- 다운로드 / 프레임 캡처 (yt-dlp + ffmpeg) ----------------
+DL_DIR = Path.home() / "Downloads" / "TVC레퍼런스"
+
+
+def find_ffmpeg():
+    import shutil, glob
+    p = shutil.which("ffmpeg")
+    if p:
+        return p
+    hits = glob.glob(str(Path.home() / "AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg*"
+                         "/ffmpeg-*/bin/ffmpeg.exe"))
+    return hits[0] if hits else "ffmpeg"
+
+
+def do_download(url):
+    """원본 최고화질(1080p 상한)로 Downloads/TVC레퍼런스에 저장 후 폴더 열기."""
+    DL_DIR.mkdir(parents=True, exist_ok=True)
+    log(f"⬇ 다운로드 시작: {url}")
+    cmd = [sys.executable, "-m", "yt_dlp",
+           "-f", "bv*[height<=1080]+ba/b[height<=1080]/b",
+           "--ffmpeg-location", find_ffmpeg(),
+           "-o", "%(title).80s [%(id)s].%(ext)s", "-P", str(DL_DIR), url]
+    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if p.returncode == 0:
+        log("⬇ 다운로드 완료")
+        try:
+            import os
+            os.startfile(DL_DIR)
+        except OSError:
+            pass
+    else:
+        log(f"⬇ 다운로드 실패: {(p.stderr or '')[-200:]}")
+
+
+def do_frame(url, t):
+    """영상의 t초 지점 프레임을 JPG로 추출 → (bytes, 저장경로)."""
+    DL_DIR.mkdir(parents=True, exist_ok=True)
+    # 1) yt-dlp로 직접 스트림 URL 획득 (mp4 우선 — ffmpeg 시킹 안정성)
+    # progressive(https) 스트림 우선 — DASH mpd는 ffmpeg에서 403 나는 경우가 많음(비메오)
+    g = subprocess.run([sys.executable, "-m", "yt_dlp", "--no-update", "-g",
+                        "-f", ("b[protocol=https][height<=1080]/bv*[protocol=https][height<=1080]"
+                               "/bv*[ext=mp4][height<=1080]/b"), url],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
+    stream = (g.stdout or "").strip().splitlines()
+    out = DL_DIR / f"캡처_{int(time.time())}_{int(t)}s.jpg"
+    UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+          "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
+    if stream:
+        # 1차: 스트림 URL에서 바로 추출 (브라우저 헤더 필요 — 비메오 CDN 403 방지)
+        f = subprocess.run([find_ffmpeg(), "-y", "-user_agent", UA,
+                            "-referer", "https://vimeo.com/" if "vimeo" in url else "https://www.youtube.com/",
+                            "-ss", f"{t:.2f}", "-i", stream[0],
+                            "-frames:v", "1", "-q:v", "2", str(out)],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=90)
+        if f.returncode == 0 and out.exists():
+            return out.read_bytes(), str(out)
+    # 2차 폴백: 해당 구간만 임시 다운로드(yt-dlp가 인증 헤더 처리) 후 추출
+    import tempfile, glob as _glob
+    with tempfile.TemporaryDirectory() as td:
+        dl = subprocess.run([sys.executable, "-m", "yt_dlp", "--no-update",
+                             "--download-sections", f"*{max(t-0.5,0):.1f}-{t+1.5:.1f}",
+                             "-f", "bv*[height<=1080]/b", "--ffmpeg-location", find_ffmpeg(),
+                             "-o", "clip.%(ext)s", "-P", td, url],
+                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180)
+        clips = _glob.glob(str(Path(td) / "clip.*"))
+        if not clips:
+            raise RuntimeError("구간 다운로드 실패: " + (dl.stderr or "")[-150:])
+        f2 = subprocess.run([find_ffmpeg(), "-y", "-ss", "0.5", "-i", clips[0],
+                             "-frames:v", "1", "-q:v", "2", str(out)],
+                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
+        if f2.returncode != 0 or not out.exists():
+            # 구간 맨 앞 프레임이라도
+            f3 = subprocess.run([find_ffmpeg(), "-y", "-i", clips[0],
+                                 "-frames:v", "1", "-q:v", "2", str(out)],
+                                capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
+            if f3.returncode != 0 or not out.exists():
+                raise RuntimeError("프레임 추출 실패: " + (f2.stderr or "")[-150:])
+    return out.read_bytes(), str(out)
 
 
 def main():

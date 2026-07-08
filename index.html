@@ -263,6 +263,26 @@
     background: #000; border-radius: 12px; overflow: hidden; display: none;
   }
   .playerframe iframe { width: 100%; height: 100%; border: 0; }
+  /* ---- 대형 플레이어 모달 ---- */
+  .pmodal { position: fixed; inset: 0; z-index: 900; display: none;
+    background: rgba(5,6,10,.88); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center; padding: 18px; }
+  .pmodal.open { display: flex; }
+  .pmodal-box { width: min(1200px, 96vw); max-height: 94vh; display: flex; flex-direction: column; gap: 10px; }
+  .pmodal-frame { aspect-ratio: 16/9; width: 100%; background: #000; border-radius: 14px;
+    overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,.6); }
+  .pmodal-frame iframe { width: 100%; height: 100%; border: 0; }
+  .pmodal-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .pmodal-title { flex: 1; min-width: 200px; }
+  .pmodal-title .t { font-weight: 700; font-size: 15px; }
+  .pmodal-title .s { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .pmodal-bar .btn { white-space: nowrap; }
+  .pmodal-close { position: absolute; top: 14px; right: 18px; background: none; border: 0;
+    color: #fff; font-size: 26px; cursor: pointer; opacity: .7; }
+  .pmodal-close:hover { opacity: 1; }
+  .pmodal-caps { display: flex; gap: 8px; overflow-x: auto; }
+  .pmodal-caps img { height: 64px; border-radius: 8px; border: 1px solid var(--line); }
+  @media (max-width: 640px) { .pmodal { padding: 8px; } .pmodal-bar .btn { font-size: 12px; padding: 8px 10px; } }
   .saverow { display: none; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
   .saverow input, .saverow select {
     background: var(--card); border: 1px solid var(--line); border-radius: 10px;
@@ -658,8 +678,10 @@ function mvCardHtml(v, m, i) {
     </div>`;
 }
 function mvPlay(key, i, vid) {
-  const th = document.getElementById(`th-mv-${key}-${i}`);
-  if (th) th.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${vid}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+  const m = MOVES.find(x => x.key === key);
+  const v = m && m.videos.find(x => x.id === vid);
+  openPlayer({ platform: "youtube", id: vid, title: v ? v.title : "",
+               sub: "카메라 무빙 · " + (m ? (m.name || m.key) : "") });
 }
 function mvSave(key, vid, btn) {
   const m = MOVES.find(x => x.key === key);
@@ -767,12 +789,8 @@ function lgCardHtml(v, ei, i, entryName) {
 }
 function lgPlay(ei, i) {
   const v = LEGENDS[ei].videos[i];
-  const th = document.getElementById(`th-lg-${ei}-${i}`);
-  if (!th || !v) return;
-  const src = v.platform === "vimeo"
-    ? `https://player.vimeo.com/video/${v.id}?autoplay=1`
-    : `https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1`;
-  th.innerHTML = `<iframe src="${src}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+  if (!v) return;
+  openPlayer({ platform: v.platform || "youtube", id: v.id, title: v.title, sub: LEGENDS[ei].name });
 }
 function lgSave(ei, i, btn) {
   const e = LEGENDS[ei];
@@ -878,13 +896,9 @@ function renderHip() {
     </div>`).join("");
 }
 function hpPlay(si, vi) {
-  const v = HIP[si].videos[vi];
-  const th = document.getElementById(`th-hp-${si}-${vi}`);
-  if (!th || !v) return;
-  const src = v.platform === "vimeo"
-    ? `https://player.vimeo.com/video/${v.id}?autoplay=1`
-    : `https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1`;
-  th.innerHTML = `<iframe src="${src}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+  const s = HIP[si], v = s && s.videos[vi];
+  if (!v) return;
+  openPlayer({ platform: v.platform || "youtube", id: v.id, title: v.title, sub: `${s.name} · ${s.cat}` });
 }
 function hpSave(si, vi, btn) {
   const s = HIP[si], v = s && s.videos[vi];
@@ -1164,8 +1178,9 @@ function setShGroup(g, btn) {
   renderShorts();
 }
 function shPlay(listName, i, vid) {
-  const th = document.getElementById(`th-sh-${listName}-${i}`);
-  if (th) th.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${vid}?autoplay=1&loop=1&playlist=${vid}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+  const v = shItems(listName)[i];
+  openPlayer({ platform: "youtube", id: vid, loop: true,
+               title: v ? `[${v.sec}초] ${v.title}` : "", sub: v ? `5초 컷 · ${v.group}` : "5초 컷" });
 }
 function shSave(listName, i, btn) {
   const v = shItems(listName)[i];
@@ -1330,8 +1345,14 @@ function renderCountry(cid) {
 }
 
 function playCard(cid, idx, vid) {
-  const th = document.getElementById(`th-${cid}-${idx}`);
-  if (th) th.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${vid}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+  let it = null;
+  if (cid === "fd") it = fdItems()[idx];
+  if (!it) {
+    const grid = document.getElementById("grid-" + cid);
+    it = (grid && grid._items || []).find(x => x.id === vid);
+  }
+  openPlayer({ platform: (it && it.platform) || "youtube", id: vid,
+               title: it ? it.title : "", sub: it ? (it.brand || it.ch || it.channel || "") : "" });
 }
 
 function quickSave(cid, vid, btn) {
@@ -1489,6 +1510,105 @@ function toast(msg) {
   t.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+/* ================= 대형 플레이어 모달 (다운로드 · 프레임 캡처) ================= */
+document.body.insertAdjacentHTML("beforeend", `
+<div class="pmodal" id="pmodal">
+  <button class="pmodal-close" onclick="pmClose()">✕</button>
+  <div class="pmodal-box">
+    <div class="pmodal-frame" id="pmFrame"></div>
+    <div class="pmodal-bar">
+      <div class="pmodal-title"><div class="t" id="pmTitle"></div><div class="s" id="pmSub"></div></div>
+      <button class="btn ghost sm" onclick="pmCapture(this)" title="현재 재생 지점의 프레임을 JPG로 저장">📸 캡처</button>
+      <button class="btn ghost sm" onclick="pmDownload(this)" title="원본 화질로 다운로드 (Downloads\\TVC레퍼런스)">⬇ 다운로드</button>
+      <a class="btn ghost sm" id="pmOrig" target="_blank" rel="noopener">↗ 원본</a>
+    </div>
+    <div class="pmodal-caps" id="pmCaps"></div>
+  </div>
+</div>`);
+
+const PM = { cur: null, t: 0 };
+let HELPER = location.port === "8777" ? location.origin : "http://127.0.0.1:8777";
+let HELPER_OK = false;
+fetch(HELPER + "/api/ping").then(r => r.json()).then(() => HELPER_OK = true).catch(() => HELPER_OK = false);
+
+// 재생 시점 추적 (YouTube/Vimeo postMessage API)
+window.addEventListener("message", e => {
+  try {
+    const d = typeof e.data === "string" ? JSON.parse(e.data) : e.data;
+    if (d.event === "infoDelivery" && d.info && d.info.currentTime != null) PM.t = d.info.currentTime;      // YouTube
+    if (d.event === "timeupdate" && d.data && d.data.seconds != null) PM.t = d.data.seconds;                // Vimeo
+    if (d.event === "ready" && e.origin.includes("vimeo")) {
+      const f = document.querySelector("#pmFrame iframe");
+      if (f) f.contentWindow.postMessage(JSON.stringify({ method: "addEventListener", value: "timeupdate" }), "*");
+    }
+  } catch (err) { /* 무시 */ }
+});
+
+function openPlayer(v) {
+  // v = {platform, id, title, sub, loop}
+  PM.cur = v; PM.t = 0;
+  const url = v.platform === "vimeo" ? `https://vimeo.com/${v.id}` : `https://www.youtube.com/watch?v=${v.id}`;
+  PM.cur.url = url;
+  const src = v.platform === "vimeo"
+    ? `https://player.vimeo.com/video/${v.id}?autoplay=1`
+    : `https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&enablejsapi=1${v.loop ? `&loop=1&playlist=${v.id}` : ""}`;
+  document.getElementById("pmFrame").innerHTML =
+    `<iframe src="${src}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+  document.getElementById("pmTitle").textContent = v.title || "";
+  document.getElementById("pmSub").textContent = v.sub || "";
+  document.getElementById("pmOrig").href = url;
+  document.getElementById("pmCaps").innerHTML = "";
+  document.getElementById("pmodal").classList.add("open");
+  document.body.style.overflow = "hidden";
+  // YouTube 시간 추적 시작
+  if (v.platform !== "vimeo") setTimeout(() => {
+    const f = document.querySelector("#pmFrame iframe");
+    if (f) f.contentWindow.postMessage(JSON.stringify({ event: "listening", id: 1, channel: "widget" }), "*");
+  }, 1200);
+}
+function pmClose() {
+  document.getElementById("pmodal").classList.remove("open");
+  document.getElementById("pmFrame").innerHTML = "";
+  document.body.style.overflow = "";
+}
+document.getElementById("pmodal").addEventListener("click", e => { if (e.target.id === "pmodal") pmClose(); });
+window.addEventListener("keydown", e => { if (e.key === "Escape") pmClose(); });
+
+function pmNeedHelper() {
+  toast("PC에서 'TVC레퍼런스허브.bat'를 실행해 두면 다운로드·캡처가 작동해요");
+}
+async function pmDownload(btn) {
+  if (!PM.cur) return;
+  if (!HELPER_OK) return pmNeedHelper();
+  btn.disabled = true;
+  try {
+    await fetch(HELPER + "/api/download", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: PM.cur.url }) });
+    toast("⬇ 다운로드 시작! 완료되면 Downloads\\TVC레퍼런스 폴더가 열려요");
+  } catch (e) { toast("다운로드 요청 실패 🥲"); }
+  btn.disabled = false;
+}
+async function pmCapture(btn) {
+  if (!PM.cur) return;
+  if (!HELPER_OK) return pmNeedHelper();
+  const t = PM.t || 0;
+  btn.disabled = true; const old = btn.textContent; btn.textContent = "📸 캡처 중…";
+  try {
+    const r = await fetch(HELPER + "/api/frame", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: PM.cur.url, t }) });
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error);
+    const dataUrl = "data:image/jpeg;base64," + d.jpg_b64;
+    const img = document.createElement("img");
+    img.src = dataUrl; img.title = d.path;
+    document.getElementById("pmCaps").appendChild(img);
+    const a = document.createElement("a");
+    a.href = dataUrl; a.download = `캡처_${Math.round(t)}s.jpg`; a.click();
+    toast(`📸 ${Math.round(t)}초 지점 캡처 완료 (Downloads\\TVC레퍼런스에도 저장)`);
+  } catch (e) { toast("캡처 실패: " + (e.message || "").slice(0, 80)); }
+  btn.disabled = false; btn.textContent = old;
 }
 
 /* init */
