@@ -1046,19 +1046,22 @@ function fdSave(i, btn) {
   toast("⭐ 보관함에 저장했어요");
 }
 
-/* ===== 데이터 갱신 (serve.py API) ===== */
+/* ===== 데이터 갱신 (serve.py API) =====
+   로컬(8777)에선 same-origin, 웹 배포판에선 PC에서 켜둔 헬퍼(127.0.0.1:8777)로 연결 */
+const UPD_BASE = location.port === "8777" ? "" : "http://127.0.0.1:8777";
+const UPD_REMOTE = UPD_BASE !== "";
 let updTimer = null;
 async function initUpdater() {
   try {
-    const r = await fetch("/api/ping");
+    const r = await fetch(UPD_BASE + "/api/ping");
     if (!r.ok) return;
     document.getElementById("updBtns").style.display = "inline-flex";
-    const s = await (await fetch("/api/status")).json();
+    const s = await (await fetch(UPD_BASE + "/api/status")).json();
     if (s.running) watchUpdate();
-  } catch (e) { /* 정적 서버/file:// — 버튼 숨김 유지 */ }
+  } catch (e) { /* 헬퍼 없음 — 버튼 숨김 유지 (Pages는 Actions가 매일 자동 갱신) */ }
 }
 function startUpdate(mode) {
-  fetch("/api/update?mode=" + mode, { method: "POST" })
+  fetch(UPD_BASE + "/api/update?mode=" + mode, { method: "POST" })
     .then(r => r.json())
     .then(j => {
       if (j.ok) { toast(mode === "full" ? "전체 갱신 시작 (10분+)" : "신작 갱신 시작"); watchUpdate(); }
@@ -1075,16 +1078,16 @@ function watchUpdate() {
 async function pollUpdate() {
   clearTimeout(updTimer);
   try {
-    const s = await (await fetch("/api/status")).json();
+    const s = await (await fetch(UPD_BASE + "/api/status")).json();
     const logEl = document.getElementById("updLog");
     logEl.textContent = s.log.join("\n");
     logEl.scrollTop = logEl.scrollHeight;
     if (s.running) {
       updTimer = setTimeout(pollUpdate, 2500);
     } else if (s.done) {
-      document.getElementById("updTitle").textContent = "✅ 갱신 완료!";
+      document.getElementById("updTitle").textContent = UPD_REMOTE ? "✅ 갱신 완료! (웹 반영 1~2분)" : "✅ 갱신 완료!";
       document.getElementById("updReload").style.display = "inline-block";
-      toast("✅ 갱신 완료 — 새로고침하면 반영됩니다");
+      toast(UPD_REMOTE ? "✅ 갱신 완료 — 웹사이트 반영까지 1~2분 후 새로고침" : "✅ 갱신 완료 — 새로고침하면 반영됩니다");
     }
   } catch (e) {
     updTimer = setTimeout(pollUpdate, 4000);
