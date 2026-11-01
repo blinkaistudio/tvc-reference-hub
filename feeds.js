@@ -1,1 +1,1 @@
-window.TVC_FEEDS = {"fetchedAt": "2026-10-31", "channels": []};
+window.TVC_FEEDS = {"fetchedAt": "2026-11-01", "channels": []};
